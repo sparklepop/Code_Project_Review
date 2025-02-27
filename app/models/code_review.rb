@@ -6,27 +6,27 @@ class CodeReview < ApplicationRecord
   # Score calculation methods
   def calculate_quality_score
     return 0 unless quality_scores
-    quality_scores.values.sum
+    quality_scores.values.map(&:to_i).sum
   end
 
   def calculate_documentation_score
     return 0 unless documentation_scores
-    documentation_scores.values.sum
+    documentation_scores.values.map(&:to_i).sum
   end
 
   def calculate_technical_score
     return 0 unless technical_scores
-    technical_scores.values.sum
+    technical_scores.values.map(&:to_i).sum
   end
 
   def calculate_problem_solving_score
     return 0 unless problem_solving_scores
-    problem_solving_scores.values.sum
+    problem_solving_scores.values.map(&:to_i).sum
   end
 
   def calculate_testing_bonus
     return 0 unless testing_scores
-    testing_scores.values.sum
+    testing_scores.values.map(&:to_i).sum
   end
 
   def calculate_total_score
