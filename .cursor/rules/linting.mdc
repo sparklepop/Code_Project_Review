@@ -1,0 +1,12 @@
+---
+description: Style rules as discovered in the CI linting
+globs: 
+---
+
+# Your rule content
+
+- Avoid trailing whitespace
+- Prefer double-quoted strings unless you need single quotes to avoid extra backslashes for escaping
+- use Ruby on Rails conventions
+- `%W`-literals should be delimited by `[` and `]`
+- remove trailing empty lines
