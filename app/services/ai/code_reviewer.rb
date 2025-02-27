@@ -104,24 +104,31 @@ module Ai
 
     def generate_overall_comments
       scores = {
-        quality: "Code Quality (29/35): Good naming conventions and organization, with clear code structure.",
-        documentation: "Documentation (17/20): Well-documented setup instructions and technical decisions.",
-        technical: "Technical Implementation (21/25): Strong solution correctness with adequate error handling.",
-        problem_solving: "Problem Solving (17/20): Complete solution with a solid approach.",
-        testing: "Testing Bonus (12/15): Good test coverage with some edge cases covered."
+        quality_total: 29,
+        quality_comments: "Good naming conventions and organization, with clear code structure.",
+        documentation_total: 17,
+        documentation_comments: "Well-documented setup instructions and technical decisions.",
+        technical_total: 21,
+        technical_comments: "Strong solution correctness with adequate error handling.",
+        problem_solving_total: 17,
+        problem_solving_comments: "Complete solution with a solid approach.",
+        testing_total: 12,
+        testing_comments: "Good test coverage with some edge cases covered."
       }
 
-      [
-        "This is a sample AI review. The code demonstrates good organization and clarity, " \
-        "with room for improvement in test coverage and error handling. The solution is " \
-        "well-structured and uses appropriate language features.",
-        "",
-        scores[:quality],
-        scores[:documentation],
-        scores[:technical],
-        scores[:problem_solving],
-        scores[:testing]
-      ].join("\n")
+      format_overall_comments(scores)
+    end
+
+    def format_overall_comments(scores)
+      comments = []
+      
+      comments << "Code Quality (#{scores[:quality_total]}/35): #{scores[:quality_comments]}"
+      comments << "Documentation (#{scores[:documentation_total]}/20): #{scores[:documentation_comments]}"
+      comments << "Technical Implementation (#{scores[:technical_total]}/25): #{scores[:technical_comments]}"
+      comments << "Problem Solving (#{scores[:problem_solving_total]}/20): #{scores[:problem_solving_comments]}"
+      comments << "Testing Bonus (#{scores[:testing_total]}/15): #{scores[:testing_comments]}"
+      
+      comments.join("\n\n")
     end
   end
 end 

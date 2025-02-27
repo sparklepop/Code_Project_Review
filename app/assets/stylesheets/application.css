@@ -9,60 +9,228 @@
  * Consider organizing styles into separate files for maintainability.
  */
 
-.analyzing-text {
-  position: relative;
-  display: inline-block;
+/* Modern Typography */
+:root {
+  --primary-color: #007AFF;      /* Apple blue */
+  --danger-color: #FF3B30;       /* Apple red */
+  --success-color: #34C759;      /* Apple green */
+  --warning-color: #FF9500;      /* Apple orange */
+  --text-primary: #000000;
+  --text-secondary: #666666;
+  --background-light: #F5F5F7;   /* Apple light gray */
+  --border-color: #E5E5EA;
+  --shadow-color: rgba(0, 0, 0, 0.1);
 }
 
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--text-primary);
+  line-height: 1.5;
+  background-color: var(--background-light);
+}
+
+/* Modern Card Styling */
+.card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px var(--shadow-color);
+  margin-bottom: 1.5rem;
+  background: white;
+}
+
+.card-header {
+  background: white;
+  border-bottom: 1px solid var(--border-color);
+  padding: 1.25rem;
+  border-radius: 12px 12px 0 0 !important;
+}
+
+.card-body {
+  padding: 1.25rem;
+}
+
+/* Typography */
+h1 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+h3 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin: 1.5rem 0 1rem;
+}
+
+/* Form Controls */
+.form-control {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+  outline: none;
+}
+
+/* Score Inputs */
+.score-input {
+  max-width: 80px;
+  text-align: right;
+  font-size: 1rem;
+  font-weight: 500;
+  padding-right: 0.5rem;
+  margin-right: 1rem;
+}
+
+/* Buttons */
+.btn {
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: darken(var(--primary-color), 10%);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: var(--background-light);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+/* Comments Textarea */
+textarea.auto-expand {
+  min-height: 150px;
+  width: 100%;
+  resize: none;
+  overflow-y: hidden;
+  transition: all 0.2s ease;
+  padding: 1rem;
+  line-height: 1.6;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+textarea.auto-expand:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+/* Analysis Progress */
+.spinner-border {
+  color: var(--primary-color);
+}
+
+/* Score Section Spacing */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: var(--text-secondary);
+}
+
+/* Container Padding */
+.container {
+  padding: 1.5rem;
+  max-width: 1000px;
+}
+
+/* Alert Styling */
+.alert {
+  border: none;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+}
+
+.alert-danger {
+  background-color: rgba(255, 59, 48, 0.1);
+  color: var(--danger-color);
+}
+
+/* Form Section Headers */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+/* Score Labels */
+.score-label {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.score-label label {
+  flex-grow: 1;
+  margin-bottom: 0;
+  color: var(--text-secondary);
+}
+
+/* Remove old animation styles */
 .analyzing-text:after {
-  content: "...";
-  position: absolute;
-  width: 20px;
-  text-align: left;
-  animation: dots 1.5s steps(4, end) infinite;
+  display: none;
 }
 
-@keyframes dots {
-  0%, 20% { content: ""; }
-  40% { content: "."; }
-  60% { content: ".."; }
-  80%, 100% { content: "..."; }
+/* Modern Loading Animation */
+.analysis-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
 }
 
-.btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.7;
+/* Form Actions */
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
 }
 
-@keyframes highlight-update {
-  0% {
-    background-color: #fff;
-  }
-  50% {
-    background-color: #e3f2fd;  /* Light blue highlight */
-  }
-  100% {
-    background-color: #fff;
-  }
+/* Form Container */
+.review-form-container {
+  background: var(--background-light);
+  border-radius: 12px;
+  padding: 1px; /* Minimal padding to contain margin of child elements */
+  margin-top: 2rem;
 }
 
-.field-updated {
-  animation: highlight-update 1s ease;
-  border-color: #2196F3 !important;  /* Blue border for updated fields */
+/* Adjust header spacing */
+.container > .d-flex {
+  background: white;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px var(--shadow-color);
 }
 
-.field-updated-label {
-  position: relative;
-}
-
-.field-updated-label::after {
-  content: "AI ✓";
-  position: absolute;
-  right: -45px;
-  top: 0;
-  font-size: 0.8em;
-  color: #2196F3;
-  padding: 2px 5px;
-  border-radius: 3px;
-  opacity: 0.8;
+/* Adjust button spacing in header */
+.d-flex .btn {
+  margin-left: 0.5rem;
 }

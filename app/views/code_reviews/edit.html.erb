@@ -2,10 +2,12 @@
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Edit Code Review</h1>
     <div>
-      <%= link_to 'Show', @code_review, class: 'btn btn-info' %>
+      <%= link_to 'Show', @code_review, class: 'btn btn-info me-2' %>
       <%= link_to 'Back', code_reviews_path, class: 'btn btn-secondary' %>
     </div>
   </div>
 
-  <%= render 'form', code_review: @code_review %>
+  <div class="review-form-container">
+    <%= render 'form', code_review: @code_review %>
+  </div>
 </div> 

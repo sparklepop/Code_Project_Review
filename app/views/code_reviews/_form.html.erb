@@ -53,50 +53,50 @@
       <h2>Code Quality and Style (35 points)</h2>
     </div>
     <div class="card-body">
-      <div class="form-group mb-3">
-        <div class="d-flex align-items-center">
-          <label class="me-2">Code Clarity (max 15)</label>
+      <div class="form-group">
+        <div class="score-label">
+          <%= f.number_field "quality_scores[code_clarity]", 
+                            value: code_review.quality_scores["code_clarity"],
+                            class: "form-control score-input",
+                            min: 0,
+                            max: 15,
+                            data: { 
+                              code_review_target: "scoreInput",
+                              score_type: "quality_scores",
+                              score_field: "code_clarity"
+                            } %>
+          <label>Code Clarity (max 15)</label>
         </div>
-        <%= f.number_field "quality_scores[code_clarity]", 
-                          value: code_review.quality_scores["code_clarity"],
-                          class: "form-control score-input",
-                          min: 0,
-                          max: 15,
-                          data: { 
-                            code_review_target: "scoreInput",
-                            score_type: "quality_scores",
-                            score_field: "code_clarity"
-                          } %>
       </div>
-      <div class="form-group mb-3">
-        <div class="d-flex align-items-center">
-          <label class="me-2">Naming Conventions (max 10)</label>
+      <div class="form-group">
+        <div class="score-label">
+          <%= f.number_field "quality_scores[naming_conventions]", 
+                            value: code_review.quality_scores["naming_conventions"],
+                            class: "form-control score-input",
+                            min: 0,
+                            max: 10,
+                            data: { 
+                              code_review_target: "scoreInput",
+                              score_type: "quality_scores",
+                              score_field: "naming_conventions"
+                            } %>
+          <label>Naming Conventions (max 10)</label>
         </div>
-        <%= f.number_field "quality_scores[naming_conventions]", 
-                          value: code_review.quality_scores["naming_conventions"],
-                          class: "form-control score-input",
-                          min: 0,
-                          max: 10,
-                          data: { 
-                            code_review_target: "scoreInput",
-                            score_type: "quality_scores",
-                            score_field: "naming_conventions"
-                          } %>
       </div>
-      <div class="form-group mb-3">
-        <div class="d-flex align-items-center">
-          <label class="me-2">Code Organization (max 10)</label>
+      <div class="form-group">
+        <div class="score-label">
+          <%= f.number_field "quality_scores[code_organization]", 
+                            value: code_review.quality_scores["code_organization"],
+                            class: "form-control score-input",
+                            min: 0,
+                            max: 10,
+                            data: { 
+                              code_review_target: "scoreInput",
+                              score_type: "quality_scores",
+                              score_field: "code_organization"
+                            } %>
+          <label>Code Organization (max 10)</label>
         </div>
-        <%= f.number_field "quality_scores[code_organization]", 
-                          value: code_review.quality_scores["code_organization"],
-                          class: "form-control score-input",
-                          min: 0,
-                          max: 10,
-                          data: { 
-                            code_review_target: "scoreInput",
-                            score_type: "quality_scores",
-                            score_field: "code_organization"
-                          } %>
       </div>
     </div>
   </div>
@@ -106,50 +106,50 @@
       <h2>Documentation (20 points)</h2>
     </div>
     <div class="card-body">
-      <div class="form-group mb-3">
-        <div class="d-flex align-items-center">
-          <label class="me-2">Setup Instructions (max 8)</label>
+      <div class="form-group">
+        <div class="score-label">
+          <%= f.number_field "documentation_scores[setup_instructions]", 
+                            value: code_review.documentation_scores["setup_instructions"],
+                            class: "form-control score-input",
+                            min: 0,
+                            max: 8,
+                            data: { 
+                              code_review_target: "scoreInput",
+                              score_type: "documentation_scores",
+                              score_field: "setup_instructions"
+                            } %>
+          <label>Setup Instructions (max 8)</label>
         </div>
-        <%= f.number_field "documentation_scores[setup_instructions]", 
-                          value: code_review.documentation_scores["setup_instructions"],
-                          class: "form-control score-input",
-                          min: 0,
-                          max: 8,
-                          data: { 
-                            code_review_target: "scoreInput",
-                            score_type: "documentation_scores",
-                            score_field: "setup_instructions"
-                          } %>
       </div>
-      <div class="form-group mb-3">
-        <div class="d-flex align-items-center">
-          <label class="me-2">Technical Decisions (max 7)</label>
+      <div class="form-group">
+        <div class="score-label">
+          <%= f.number_field "documentation_scores[technical_decisions]", 
+                            value: code_review.documentation_scores["technical_decisions"],
+                            class: "form-control score-input",
+                            min: 0,
+                            max: 7,
+                            data: { 
+                              code_review_target: "scoreInput",
+                              score_type: "documentation_scores",
+                              score_field: "technical_decisions"
+                            } %>
+          <label>Technical Decisions (max 7)</label>
         </div>
-        <%= f.number_field "documentation_scores[technical_decisions]", 
-                          value: code_review.documentation_scores["technical_decisions"],
-                          class: "form-control score-input",
-                          min: 0,
-                          max: 7,
-                          data: { 
-                            code_review_target: "scoreInput",
-                            score_type: "documentation_scores",
-                            score_field: "technical_decisions"
-                          } %>
       </div>
-      <div class="form-group mb-3">
-        <div class="d-flex align-items-center">
-          <label class="me-2">Assumptions (max 5)</label>
+      <div class="form-group">
+        <div class="score-label">
+          <%= f.number_field "documentation_scores[assumptions]", 
+                            value: code_review.documentation_scores["assumptions"],
+                            class: "form-control score-input",
+                            min: 0,
+                            max: 5,
+                            data: { 
+                              code_review_target: "scoreInput",
+                              score_type: "documentation_scores",
+                              score_field: "assumptions"
+                            } %>
+          <label>Assumptions (max 5)</label>
         </div>
-        <%= f.number_field "documentation_scores[assumptions]", 
-                          value: code_review.documentation_scores["assumptions"],
-                          class: "form-control score-input",
-                          min: 0,
-                          max: 5,
-                          data: { 
-                            code_review_target: "scoreInput",
-                            score_type: "documentation_scores",
-                            score_field: "assumptions"
-                          } %>
       </div>
     </div>
   </div>
@@ -159,50 +159,41 @@
       <h2>Technical Implementation (25 points)</h2>
     </div>
     <div class="card-body">
-      <div class="form-group mb-3">
-        <div class="d-flex align-items-center">
-          <label class="me-2">Solution Correctness (max 15)</label>
+      <div class="form-group">
+        <div class="score-label">
+          <%= f.number_field "technical_scores[solution_correctness]", 
+                            value: code_review.technical_scores["solution_correctness"],
+                            class: "form-control score-input",
+                            min: 0, max: 15,
+                            data: { code_review_target: "scoreInput",
+                                   score_type: "technical_scores",
+                                   score_field: "solution_correctness" } %>
+          <label>Solution Correctness (max 15)</label>
         </div>
-        <%= f.number_field "technical_scores[solution_correctness]", 
-                          value: code_review.technical_scores["solution_correctness"],
-                          class: "form-control score-input",
-                          min: 0,
-                          max: 15,
-                          data: { 
-                            code_review_target: "scoreInput",
-                            score_type: "technical_scores",
-                            score_field: "solution_correctness"
-                          } %>
       </div>
-      <div class="form-group mb-3">
-        <div class="d-flex align-items-center">
-          <label class="me-2">Error Handling (max 5)</label>
+      <div class="form-group">
+        <div class="score-label">
+          <%= f.number_field "technical_scores[error_handling]", 
+                            value: code_review.technical_scores["error_handling"],
+                            class: "form-control score-input",
+                            min: 0, max: 5,
+                            data: { code_review_target: "scoreInput",
+                                   score_type: "technical_scores",
+                                   score_field: "error_handling" } %>
+          <label>Error Handling (max 5)</label>
         </div>
-        <%= f.number_field "technical_scores[error_handling]", 
-                          value: code_review.technical_scores["error_handling"],
-                          class: "form-control score-input",
-                          min: 0,
-                          max: 5,
-                          data: { 
-                            code_review_target: "scoreInput",
-                            score_type: "technical_scores",
-                            score_field: "error_handling"
-                          } %>
       </div>
-      <div class="form-group mb-3">
-        <div class="d-flex align-items-center">
-          <label class="me-2">Language Usage (max 5)</label>
+      <div class="form-group">
+        <div class="score-label">
+          <%= f.number_field "technical_scores[language_usage]", 
+                            value: code_review.technical_scores["language_usage"],
+                            class: "form-control score-input",
+                            min: 0, max: 5,
+                            data: { code_review_target: "scoreInput",
+                                   score_type: "technical_scores",
+                                   score_field: "language_usage" } %>
+          <label>Language Usage (max 5)</label>
         </div>
-        <%= f.number_field "technical_scores[language_usage]", 
-                          value: code_review.technical_scores["language_usage"],
-                          class: "form-control score-input",
-                          min: 0,
-                          max: 5,
-                          data: { 
-                            code_review_target: "scoreInput",
-                            score_type: "technical_scores",
-                            score_field: "language_usage"
-                          } %>
       </div>
     </div>
   </div>
@@ -212,35 +203,29 @@
       <h2>Problem Solving (20 points)</h2>
     </div>
     <div class="card-body">
-      <div class="form-group mb-3">
-        <div class="d-flex align-items-center">
-          <label class="me-2">Completeness (max 10)</label>
+      <div class="form-group">
+        <div class="score-label">
+          <%= f.number_field "problem_solving_scores[completeness]", 
+                            value: code_review.problem_solving_scores["completeness"],
+                            class: "form-control score-input",
+                            min: 0, max: 10,
+                            data: { code_review_target: "scoreInput",
+                                   score_type: "problem_solving_scores",
+                                   score_field: "completeness" } %>
+          <label>Completeness (max 10)</label>
         </div>
-        <%= f.number_field "problem_solving_scores[completeness]", 
-                          value: code_review.problem_solving_scores["completeness"],
-                          class: "form-control score-input",
-                          min: 0,
-                          max: 10,
-                          data: { 
-                            code_review_target: "scoreInput",
-                            score_type: "problem_solving_scores",
-                            score_field: "completeness"
-                          } %>
       </div>
-      <div class="form-group mb-3">
-        <div class="d-flex align-items-center">
-          <label class="me-2">Approach (max 10)</label>
+      <div class="form-group">
+        <div class="score-label">
+          <%= f.number_field "problem_solving_scores[approach]", 
+                            value: code_review.problem_solving_scores["approach"],
+                            class: "form-control score-input",
+                            min: 0, max: 10,
+                            data: { code_review_target: "scoreInput",
+                                   score_type: "problem_solving_scores",
+                                   score_field: "approach" } %>
+          <label>Approach (max 10)</label>
         </div>
-        <%= f.number_field "problem_solving_scores[approach]", 
-                          value: code_review.problem_solving_scores["approach"],
-                          class: "form-control score-input",
-                          min: 0,
-                          max: 10,
-                          data: { 
-                            code_review_target: "scoreInput",
-                            score_type: "problem_solving_scores",
-                            score_field: "approach"
-                          } %>
       </div>
     </div>
   </div>
@@ -250,50 +235,41 @@
       <h2>Testing Bonus (15 points)</h2>
     </div>
     <div class="card-body">
-      <div class="form-group mb-3">
-        <div class="d-flex align-items-center">
-          <label class="me-2">Coverage (max 7)</label>
+      <div class="form-group">
+        <div class="score-label">
+          <%= f.number_field "testing_scores[coverage]", 
+                            value: code_review.testing_scores["coverage"],
+                            class: "form-control score-input",
+                            min: 0, max: 7,
+                            data: { code_review_target: "scoreInput",
+                                   score_type: "testing_scores",
+                                   score_field: "coverage" } %>
+          <label>Coverage (max 7)</label>
         </div>
-        <%= f.number_field "testing_scores[coverage]", 
-                          value: code_review.testing_scores["coverage"],
-                          class: "form-control score-input",
-                          min: 0,
-                          max: 7,
-                          data: { 
-                            code_review_target: "scoreInput",
-                            score_type: "testing_scores",
-                            score_field: "coverage"
-                          } %>
       </div>
-      <div class="form-group mb-3">
-        <div class="d-flex align-items-center">
-          <label class="me-2">Quality (max 5)</label>
+      <div class="form-group">
+        <div class="score-label">
+          <%= f.number_field "testing_scores[quality]", 
+                            value: code_review.testing_scores["quality"],
+                            class: "form-control score-input",
+                            min: 0, max: 5,
+                            data: { code_review_target: "scoreInput",
+                                   score_type: "testing_scores",
+                                   score_field: "quality" } %>
+          <label>Quality (max 5)</label>
         </div>
-        <%= f.number_field "testing_scores[quality]", 
-                          value: code_review.testing_scores["quality"],
-                          class: "form-control score-input",
-                          min: 0,
-                          max: 5,
-                          data: { 
-                            code_review_target: "scoreInput",
-                            score_type: "testing_scores",
-                            score_field: "quality"
-                          } %>
       </div>
-      <div class="form-group mb-3">
-        <div class="d-flex align-items-center">
-          <label class="me-2">Edge Cases (max 3)</label>
+      <div class="form-group">
+        <div class="score-label">
+          <%= f.number_field "testing_scores[edge_cases]", 
+                            value: code_review.testing_scores["edge_cases"],
+                            class: "form-control score-input",
+                            min: 0, max: 3,
+                            data: { code_review_target: "scoreInput",
+                                   score_type: "testing_scores",
+                                   score_field: "edge_cases" } %>
+          <label>Edge Cases (max 3)</label>
         </div>
-        <%= f.number_field "testing_scores[edge_cases]", 
-                          value: code_review.testing_scores["edge_cases"],
-                          class: "form-control score-input",
-                          min: 0,
-                          max: 3,
-                          data: { 
-                            code_review_target: "scoreInput",
-                            score_type: "testing_scores",
-                            score_field: "edge_cases"
-                          } %>
       </div>
     </div>
   </div>
@@ -307,10 +283,16 @@
 
   <div class="form-group mb-4">
     <%= f.label :overall_comments %>
-    <%= f.text_area :overall_comments, class: "form-control", rows: 5 %>
+    <%= f.text_area :overall_comments, 
+                    class: "form-control auto-expand", 
+                    rows: 5,
+                    data: { 
+                      controller: "auto-expand",
+                      action: "input->auto-expand#resize"
+                    } %>
   </div>
 
-  <div class="form-group">
+  <div class="form-actions">
     <%= f.submit class: "btn btn-primary" %>
     <%= link_to "Cancel", code_reviews_path, class: "btn btn-secondary" %>
   </div>
