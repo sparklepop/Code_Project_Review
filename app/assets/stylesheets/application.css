@@ -33,3 +33,36 @@
   cursor: not-allowed;
   opacity: 0.7;
 }
+
+@keyframes highlight-update {
+  0% {
+    background-color: #fff;
+  }
+  50% {
+    background-color: #e3f2fd;  /* Light blue highlight */
+  }
+  100% {
+    background-color: #fff;
+  }
+}
+
+.field-updated {
+  animation: highlight-update 1s ease;
+  border-color: #2196F3 !important;  /* Blue border for updated fields */
+}
+
+.field-updated-label {
+  position: relative;
+}
+
+.field-updated-label::after {
+  content: "AI ✓";
+  position: absolute;
+  right: -45px;
+  top: 0;
+  font-size: 0.8em;
+  color: #2196F3;
+  padding: 2px 5px;
+  border-radius: 3px;
+  opacity: 0.8;
+}

@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["submissionUrl", "form", "analyzeButton"]
+  static targets = ["submissionUrl", "form", "analyzeButton", "scoreInput"]
 
   analyze() {
     const url = this.submissionUrlTarget.value
@@ -74,38 +74,72 @@ export default class extends Controller {
     }
   }
 
-  fillForm(data) {
-    // Fill quality scores
-    Object.entries(data.quality_scores).forEach(([key, value]) => {
-      this.setFieldValue('quality_scores', key, value)
-    })
-
-    // Fill documentation scores
-    Object.entries(data.documentation_scores).forEach(([key, value]) => {
-      this.setFieldValue('documentation_scores', key, value)
-    })
-
-    // Fill technical scores
-    Object.entries(data.technical_scores).forEach(([key, value]) => {
-      this.setFieldValue('technical_scores', key, value)
-    })
-
-    // Fill problem solving scores
-    Object.entries(data.problem_solving_scores).forEach(([key, value]) => {
-      this.setFieldValue('problem_solving_scores', key, value)
-    })
-
-    // Fill testing scores
-    Object.entries(data.testing_scores).forEach(([key, value]) => {
-      this.setFieldValue('testing_scores', key, value)
-    })
-
-    // Fill overall comments
-    document.getElementById('code_review_overall_comments').value = data.overall_comments
+  debugFormFields() {
+    const inputs = this.scoreInputTargets;
+    console.log("All score input fields:", inputs.map(input => ({
+      name: input.name,
+      scoreType: input.dataset.scoreType,
+      scoreField: input.dataset.scoreField,
+      value: input.value
+    })));
   }
 
-  setFieldValue(section, key, value) {
-    const field = document.querySelector(`[name="code_review[${section}][${key}]"]`)
-    if (field) field.value = value
+  fillForm(data) {
+    this.debugFormFields();
+    console.log("Filling form with data:", data);
+
+    try {
+      // Remove previous indicators
+      this.clearUpdateIndicators();
+
+      // Get all score input fields
+      const scoreInputs = this.scoreInputTargets;
+      console.log("Found score inputs:", scoreInputs.length);
+
+      scoreInputs.forEach(input => {
+        const scoreType = input.dataset.scoreType;
+        const scoreField = input.dataset.scoreField;
+        
+        if (data[scoreType] && data[scoreType][scoreField] !== undefined) {
+          console.log(`Setting ${scoreType}.${scoreField} to ${data[scoreType][scoreField]}`);
+          input.value = data[scoreType][scoreField];
+          this.addUpdateIndicators(input);
+        }
+      });
+
+      // Handle comments separately
+      const commentsField = document.getElementById('code_review_overall_comments');
+      if (commentsField && data.overall_comments) {
+        commentsField.value = data.overall_comments;
+        this.addUpdateIndicators(commentsField);
+      }
+
+      console.log("Form filling completed");
+    } catch (error) {
+      console.error("Error filling form:", error);
+      this.showError("Error filling form with analysis results");
+    }
+  }
+
+  clearUpdateIndicators() {
+    document.querySelectorAll('.field-updated').forEach(el => {
+      el.classList.remove('field-updated');
+    });
+    document.querySelectorAll('.field-updated-label').forEach(el => {
+      el.classList.remove('field-updated-label');
+    });
+  }
+
+  addUpdateIndicators(element) {
+    element.classList.add('field-updated');
+    const label = element.closest('.form-group').querySelector('label');
+    if (label) {
+      label.classList.add('field-updated-label');
+    }
+    
+    // Remove highlight after animation
+    setTimeout(() => {
+      element.classList.remove('field-updated');
+    }, 1000);
   }
 } 

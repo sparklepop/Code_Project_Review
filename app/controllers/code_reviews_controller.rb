@@ -55,6 +55,8 @@ class CodeReviewsController < ApplicationController
     begin
       submission_url = params.dig(:code_review, :submission_url)
       
+      Rails.logger.debug "Received submission URL: #{submission_url}"
+      
       if submission_url.blank?
         render json: { error: "Submission URL is required" }, status: :unprocessable_entity
         return
@@ -63,10 +65,12 @@ class CodeReviewsController < ApplicationController
       analyzer = Ai::CodeReviewer.new(submission_url)
       analysis = analyzer.analyze
       
-      if analysis.present?
+      Rails.logger.debug "Analysis completed: #{analysis.inspect}"
+      
+      if analysis.present? && analysis[:quality_scores].present?
         render json: analysis
       else
-        render json: { error: "Analysis failed" }, status: :unprocessable_entity
+        render json: { error: "Analysis failed to produce scores" }, status: :unprocessable_entity
       end
     rescue StandardError => e
       Rails.logger.error("Analysis error: #{e.message}")
