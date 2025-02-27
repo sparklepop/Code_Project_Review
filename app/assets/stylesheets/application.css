@@ -234,3 +234,29 @@ textarea.auto-expand:focus {
 .d-flex .btn {
   margin-left: 0.5rem;
 }
+
+/* Delete section styling */
+.delete-section {
+  border-color: var(--border-color);
+}
+
+/* Danger button styling */
+.btn-danger {
+  background-color: var(--danger-color);
+  border: none;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #FF2D20; /* Darker red on hover */
+  transform: translateY(-1px);
+}
+
+.btn-danger:active {
+  transform: translateY(0);
+}
+
+/* Icon spacing in buttons */
+.btn i {
+  padding-right: 12px;
+}
