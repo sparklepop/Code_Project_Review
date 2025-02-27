@@ -3,6 +3,64 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ["submissionUrl", "form", "analyzeButton", "scoreInput"]
 
+  connect() {
+    this.setupScoreInputs()
+  }
+
+  setupScoreInputs() {
+    this.scoreInputTargets.forEach(input => {
+      input.addEventListener('change', this.updateScore.bind(this))
+    })
+  }
+
+  async updateScore(event) {
+    const input = event.target
+    const scoreType = input.dataset.scoreType
+    const scoreField = input.dataset.scoreField
+    const value = input.value
+    const reviewId = this.element.dataset.reviewId
+
+    try {
+      const response = await fetch(`/code_reviews/${reviewId}/update_score`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content
+        },
+        body: JSON.stringify({
+          score_type: scoreType,
+          score_field: scoreField,
+          value: value
+        })
+      })
+
+      const result = await response.json()
+      
+      if (result.success) {
+        // Update any total score displays if needed
+        this.updateScoreDisplays(result)
+      } else {
+        console.error('Score update failed:', result.errors)
+      }
+    } catch (error) {
+      console.error('Error updating score:', error)
+    }
+  }
+
+  updateScoreDisplays(result) {
+    // Update total score display if it exists
+    const totalScoreElement = document.getElementById('total-score')
+    if (totalScoreElement) {
+      totalScoreElement.textContent = result.total_score
+    }
+
+    // Update section score if it exists
+    const sectionScoreElement = document.getElementById('section-score')
+    if (sectionScoreElement) {
+      sectionScoreElement.textContent = result.section_score
+    }
+  }
+
   analyze() {
     const url = this.submissionUrlTarget.value
     if (!url) {

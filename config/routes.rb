@@ -18,6 +18,8 @@ Rails.application.routes.draw do
     end
     member do
       get :download # For future PDF/export functionality
+      post :analyze_submission
+      patch :update_score
     end
   end
 end

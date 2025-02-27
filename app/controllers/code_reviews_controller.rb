@@ -50,15 +50,40 @@ class CodeReviewsController < ApplicationController
 
   def edit
     @code_review = CodeReview.find(params[:id])
+    puts "\n=== LOADING EDIT FORM ==="
+    puts "Quality Scores: #{@code_review.quality_scores.inspect}"
+    puts "Documentation Scores: #{@code_review.documentation_scores.inspect}"
+    puts "Technical Scores: #{@code_review.technical_scores.inspect}"
+    puts "Problem Solving Scores: #{@code_review.problem_solving_scores.inspect}"
+    puts "Testing Scores: #{@code_review.testing_scores.inspect}"
+    puts "======================="
   end
 
   def update
     @code_review = CodeReview.find(params[:id])
     
+    puts "\n=== UPDATE PARAMS ==="
+    puts JSON.pretty_generate(params.to_unsafe_h)
+    puts "======================="
+
     if @code_review.update(code_review_params)
+      puts "\n=== UPDATED IN DATABASE ==="
+      puts "ID: #{@code_review.id}"
+      puts "Quality Scores: #{@code_review.quality_scores.inspect}"
+      puts "Documentation Scores: #{@code_review.documentation_scores.inspect}"
+      puts "Technical Scores: #{@code_review.technical_scores.inspect}"
+      puts "Problem Solving Scores: #{@code_review.problem_solving_scores.inspect}"
+      puts "Testing Scores: #{@code_review.testing_scores.inspect}"
+      puts "======================="
+      
       redirect_to @code_review, notice: 'Code review was successfully updated.'
     else
-      render :edit
+      puts "\n=== UPDATE FAILED ==="
+      puts "Errors: #{@code_review.errors.full_messages}"
+      puts "Current attributes: #{@code_review.attributes.inspect}"
+      puts "======================="
+      
+      render :edit, status: :unprocessable_entity
     end
   end
 
@@ -102,10 +127,41 @@ class CodeReviewsController < ApplicationController
     end
   end
 
+  def update_score
+    @code_review = CodeReview.find(params[:id])
+    score_type = params[:score_type]
+    score_field = params[:score_field]
+    value = params[:value].to_i
+
+    puts "\n=== UPDATING SCORE ==="
+    puts "Type: #{score_type}"
+    puts "Field: #{score_field}"
+    puts "Value: #{value}"
+    
+    # Get current scores
+    scores = @code_review.send(score_type) || {}
+    # Update the specific score
+    scores[score_field] = value
+    # Update the attribute
+    @code_review.send("#{score_type}=", scores)
+
+    if @code_review.save
+      puts "Updated successfully"
+      puts "New scores: #{@code_review.send(score_type).inspect}"
+      render json: { 
+        success: true, 
+        total_score: @code_review.calculate_total_score,
+        section_score: @code_review.send("calculate_#{score_type.sub('_scores', '')}_score")
+      }
+    else
+      puts "Update failed: #{@code_review.errors.full_messages}"
+      render json: { success: false, errors: @code_review.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def code_review_params
-    # First permit the basic attributes and nested score hashes
     params.require(:code_review).permit(
       :candidate_name,
       :submission_url,
