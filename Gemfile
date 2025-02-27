@@ -52,6 +52,7 @@ group :development, :test do
   gem 'rspec-rails'
   gem 'factory_bot_rails'
   gem 'faker'
+  gem 'dotenv-rails'
 end
 
 group :development do
@@ -66,3 +67,5 @@ group :test do
   gem 'shoulda-matchers'
   gem 'rails-controller-testing'
 end
+
+gem 'octokit', '~> 6.1'

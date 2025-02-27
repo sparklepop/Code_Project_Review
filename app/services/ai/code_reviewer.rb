@@ -2,9 +2,7 @@ module Ai
   class CodeReviewer
     def initialize(submission_url)
       @submission_url = submission_url
-      # For now, just log that we would fetch content
-      Rails.logger.debug "Would fetch repository content from: #{submission_url}"
-      @repo_content = {} # Placeholder until we implement GitHub API integration
+      @repo_content = fetch_repository_content
     end
 
     def analyze
@@ -27,8 +25,10 @@ module Ai
     private
 
     def fetch_repository_content
-      # TODO: Implement GitHub API integration
-      # For now, return empty hash to prevent errors
+      fetcher = Github::RepositoryFetcher.new(@submission_url)
+      fetcher.fetch
+    rescue Github::GithubError => e
+      Rails.logger.error("Repository fetch failed: #{e.message}")
       {}
     end
 
