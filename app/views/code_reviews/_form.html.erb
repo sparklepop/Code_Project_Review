@@ -1,0 +1,15 @@
+<%= form_with(model: code_review, local: true, class: "review-form") do |f| %>
+  <% if code_review.errors.any? %>
+    <div class="alert alert-danger">
+      <h2><%= pluralize(code_review.errors.count, "error") %> prohibited this review from being saved:</h2>
+      <ul>
+        <% code_review.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <!-- Same form fields as in new.html.erb -->
+  <!-- Copy the form fields from new.html.erb here -->
+<% end %> 

@@ -2,74 +2,160 @@
   <h1>New Code Review</h1>
 
   <%= form_with(model: @code_review, local: true, class: "review-form") do |f| %>
+    <% if @code_review.errors.any? %>
+      <div class="alert alert-danger">
+        <h2><%= pluralize(@code_review.errors.count, "error") %> prohibited this review from being saved:</h2>
+        <ul>
+          <% @code_review.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
     <div class="card mb-4">
       <div class="card-header">
         <h2>Basic Information</h2>
       </div>
       <div class="card-body">
-        <div class="form-group">
+        <div class="form-group mb-3">
           <%= f.label :candidate_name %>
           <%= f.text_field :candidate_name, class: "form-control" %>
         </div>
 
-        <div class="form-group">
+        <div class="form-group mb-3">
           <%= f.label :submission_url %>
           <%= f.text_field :submission_url, class: "form-control" %>
         </div>
 
-        <div class="form-group">
+        <div class="form-group mb-3">
           <%= f.label :reviewer_name %>
           <%= f.text_field :reviewer_name, class: "form-control" %>
         </div>
       </div>
     </div>
 
-    <!-- Code Quality Section -->
     <div class="card mb-4">
       <div class="card-header">
         <h2>Code Quality and Style (35 points)</h2>
       </div>
       <div class="card-body">
         <%= f.fields_for :quality_scores do |quality| %>
-          <div class="form-group">
+          <div class="form-group mb-3">
             <label>Code Clarity (max 15)</label>
-            <%= quality.number_field :code_clarity, class: "form-control score-input",
-                                   min: 0, max: 15, data: { section: "quality" } %>
+            <%= quality.number_field :code_clarity, class: "form-control score-input", min: 0, max: 15 %>
           </div>
-          <!-- Add other quality fields similarly -->
+          <div class="form-group mb-3">
+            <label>Naming Conventions (max 10)</label>
+            <%= quality.number_field :naming_conventions, class: "form-control score-input", min: 0, max: 10 %>
+          </div>
+          <div class="form-group mb-3">
+            <label>Code Organization (max 10)</label>
+            <%= quality.number_field :code_organization, class: "form-control score-input", min: 0, max: 10 %>
+          </div>
         <% end %>
-        <div class="section-total">Total: <span id="quality-total">0</span>/35</div>
       </div>
     </div>
 
-    <!-- Add similar cards for other sections -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h2>Documentation (20 points)</h2>
+      </div>
+      <div class="card-body">
+        <%= f.fields_for :documentation_scores do |doc| %>
+          <div class="form-group mb-3">
+            <label>Setup Instructions (max 8)</label>
+            <%= doc.number_field :setup_instructions, class: "form-control score-input", min: 0, max: 8 %>
+          </div>
+          <div class="form-group mb-3">
+            <label>Technical Decisions (max 7)</label>
+            <%= doc.number_field :technical_decisions, class: "form-control score-input", min: 0, max: 7 %>
+          </div>
+          <div class="form-group mb-3">
+            <label>Assumptions (max 5)</label>
+            <%= doc.number_field :assumptions, class: "form-control score-input", min: 0, max: 5 %>
+          </div>
+        <% end %>
+      </div>
+    </div>
 
-    <div class="form-group">
+    <div class="card mb-4">
+      <div class="card-header">
+        <h2>Technical Implementation (25 points)</h2>
+      </div>
+      <div class="card-body">
+        <%= f.fields_for :technical_scores do |tech| %>
+          <div class="form-group mb-3">
+            <label>Solution Correctness (max 15)</label>
+            <%= tech.number_field :solution_correctness, class: "form-control score-input", min: 0, max: 15 %>
+          </div>
+          <div class="form-group mb-3">
+            <label>Error Handling (max 5)</label>
+            <%= tech.number_field :error_handling, class: "form-control score-input", min: 0, max: 5 %>
+          </div>
+          <div class="form-group mb-3">
+            <label>Language Usage (max 5)</label>
+            <%= tech.number_field :language_usage, class: "form-control score-input", min: 0, max: 5 %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header">
+        <h2>Problem Solving (20 points)</h2>
+      </div>
+      <div class="card-body">
+        <%= f.fields_for :problem_solving_scores do |ps| %>
+          <div class="form-group mb-3">
+            <label>Completeness (max 10)</label>
+            <%= ps.number_field :completeness, class: "form-control score-input", min: 0, max: 10 %>
+          </div>
+          <div class="form-group mb-3">
+            <label>Approach (max 10)</label>
+            <%= ps.number_field :approach, class: "form-control score-input", min: 0, max: 10 %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header">
+        <h2>Testing Bonus (15 points)</h2>
+      </div>
+      <div class="card-body">
+        <%= f.fields_for :testing_scores do |test| %>
+          <div class="form-group mb-3">
+            <label>Coverage (max 7)</label>
+            <%= test.number_field :coverage, class: "form-control score-input", min: 0, max: 7 %>
+          </div>
+          <div class="form-group mb-3">
+            <label>Quality (max 5)</label>
+            <%= test.number_field :quality, class: "form-control score-input", min: 0, max: 5 %>
+          </div>
+          <div class="form-group mb-3">
+            <label>Edge Cases (max 3)</label>
+            <%= test.number_field :edge_cases, class: "form-control score-input", min: 0, max: 3 %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="form-group mb-4">
       <%= f.label :non_working_solution, class: "form-check-label" do %>
         <%= f.check_box :non_working_solution, class: "form-check-input" %>
         Non-working Solution (-30 points)
       <% end %>
     </div>
 
-    <div class="form-group">
+    <div class="form-group mb-4">
       <%= f.label :overall_comments %>
-      <%= f.text_area :overall_comments, class: "form-control" %>
+      <%= f.text_area :overall_comments, class: "form-control", rows: 5 %>
     </div>
 
-    <div class="card mb-4">
-      <div class="card-header">
-        <h2>Final Score</h2>
-      </div>
-      <div class="card-body">
-        <div class="total-score">
-          Total Score: <span id="final-score">0</span>/115
-        </div>
-        <div class="assessment-level">
-          Assessment Level: <span id="assessment-level">Not yet calculated</span>
-        </div>
-      </div>
+    <div class="form-group">
+      <%= f.submit "Create Review", class: "btn btn-primary" %>
+      <%= link_to "Cancel", code_reviews_path, class: "btn btn-secondary" %>
     </div>
-
-    <%= f.submit "Submit Review", class: "btn btn-primary" %>
   <% end %>
 </div> 
