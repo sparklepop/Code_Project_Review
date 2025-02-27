@@ -2,6 +2,7 @@ class CodeReview < ApplicationRecord
   validates :candidate_name, presence: true
   validates :submission_url, presence: true
   validates :reviewer_name, presence: true
+  validates :quality_scores, presence: true
   
   # Add accessors for score attributes
   store_accessor :quality_scores, :code_clarity, :naming_conventions, :code_organization
@@ -61,6 +62,14 @@ class CodeReview < ApplicationRecord
     when 65..74 then "Fair - Junior candidate"
     else "Does not meet requirements"
     end
+  end
+
+  def self.permitted_quality_score_keys
+    %w[code_clarity code_clarity_reason naming_conventions naming_conventions_reason code_organization code_organization_reason]
+  end
+
+  def self.permitted_documentation_score_keys
+    %w[setup_instructions setup_instructions_reason technical_decisions technical_decisions_reason assumptions assumptions_reason]
   end
 
   private

@@ -43,13 +43,19 @@
       <!-- Code Quality -->
       <h3>Code Quality and Style (<%= @code_review.calculate_quality_score %> / 35)</h3>
       <div class="ms-4 mb-3">
-        <div class="row">
-          <div class="col-md-4">Code Clarity:</div>
-          <div class="col-md-8"><%= @code_review.quality_scores["code_clarity"] %> / 15</div>
+        <div class="row mb-2">
+          <div class="col-md-3">Code Clarity:</div>
+          <div class="col-md-2"><%= @code_review.quality_scores["code_clarity"] %> / 15</div>
+          <div class="col-md-7 text-secondary">
+            <%= @code_review.quality_scores["code_clarity_reason"] %>
+          </div>
         </div>
-        <div class="row">
-          <div class="col-md-4">Naming Conventions:</div>
-          <div class="col-md-8"><%= @code_review.quality_scores["naming_conventions"] %> / 10</div>
+        <div class="row mb-2">
+          <div class="col-md-3">Naming Conventions:</div>
+          <div class="col-md-2"><%= @code_review.quality_scores["naming_conventions"] %> / 10</div>
+          <div class="col-md-7 text-secondary">
+            <%= @code_review.quality_scores["naming_conventions_reason"] %>
+          </div>
         </div>
         <div class="row">
           <div class="col-md-4">Code Organization:</div>
