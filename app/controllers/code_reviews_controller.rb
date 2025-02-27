@@ -8,15 +8,38 @@ class CodeReviewsController < ApplicationController
   end
 
   def create
-    @code_review = CodeReview.new(code_review_params)
-    
-    Rails.logger.debug("Attempting to save code review with params: #{code_review_params.inspect}")
+    puts "\n\n=== RECEIVED PARAMS ==="
+    puts JSON.pretty_generate(params.to_unsafe_h)
+    puts "======================="
+
+    processed_params = code_review_params
+    puts "\n=== PROCESSED PARAMS ==="
+    puts JSON.pretty_generate(processed_params)
+    puts "======================="
+
+    @code_review = CodeReview.new(processed_params)
+    puts "\n=== BEFORE SAVE ==="
+    puts JSON.pretty_generate(@code_review.attributes)
+    puts "======================="
     
     if @code_review.save
-      Rails.logger.info("Successfully saved code review ##{@code_review.id}")
+      saved_review = @code_review.reload
+      puts "\n=== SAVED TO DATABASE ==="
+      puts "ID: #{saved_review.id}"
+      puts "Quality Scores: #{saved_review.quality_scores.inspect}"
+      puts "Documentation Scores: #{saved_review.documentation_scores.inspect}"
+      puts "Technical Scores: #{saved_review.technical_scores.inspect}"
+      puts "Problem Solving Scores: #{saved_review.problem_solving_scores.inspect}"
+      puts "Testing Scores: #{saved_review.testing_scores.inspect}"
+      puts "======================="
+      
       redirect_to @code_review, notice: 'Code review was successfully created.'
     else
-      Rails.logger.error("Failed to save code review: #{@code_review.errors.full_messages}")
+      puts "\n=== SAVE FAILED ==="
+      puts "Errors: #{@code_review.errors.full_messages}"
+      puts "Current attributes: #{@code_review.attributes.inspect}"
+      puts "======================="
+      
       render :new, status: :unprocessable_entity
     end
   end
@@ -55,8 +78,6 @@ class CodeReviewsController < ApplicationController
     begin
       submission_url = params.dig(:code_review, :submission_url)
       
-      Rails.logger.debug "Received submission URL: #{submission_url}"
-      
       if submission_url.blank?
         render json: { error: "Submission URL is required" }, status: :unprocessable_entity
         return
@@ -65,7 +86,9 @@ class CodeReviewsController < ApplicationController
       analyzer = Ai::CodeReviewer.new(submission_url)
       analysis = analyzer.analyze
       
-      Rails.logger.debug "Analysis completed: #{analysis.inspect}"
+      puts "\n=== ANALYSIS RESULTS ==="
+      puts JSON.pretty_generate(analysis)
+      puts "======================="
       
       if analysis.present? && analysis[:quality_scores].present?
         render json: analysis
@@ -82,17 +105,18 @@ class CodeReviewsController < ApplicationController
   private
 
   def code_review_params
+    # First permit the basic attributes and nested score hashes
     params.require(:code_review).permit(
       :candidate_name,
       :submission_url,
       :reviewer_name,
       :non_working_solution,
       :overall_comments,
-      quality_scores: {},
-      documentation_scores: {},
-      technical_scores: {},
-      problem_solving_scores: {},
-      testing_scores: {}
+      quality_scores: [:code_clarity, :naming_conventions, :code_organization],
+      documentation_scores: [:setup_instructions, :technical_decisions, :assumptions],
+      technical_scores: [:solution_correctness, :error_handling, :language_usage],
+      problem_solving_scores: [:completeness, :approach],
+      testing_scores: [:coverage, :quality, :edge_cases]
     )
   end
 end 

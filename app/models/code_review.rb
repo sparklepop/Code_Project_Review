@@ -3,14 +3,15 @@ class CodeReview < ApplicationRecord
   validates :submission_url, presence: true
   validates :reviewer_name, presence: true
   
-  # Initialize empty hashes for scores if they're nil
-  after_initialize do
-    self.quality_scores ||= {}
-    self.documentation_scores ||= {}
-    self.technical_scores ||= {}
-    self.problem_solving_scores ||= {}
-    self.testing_scores ||= {}
-  end
+  # Add accessors for score attributes
+  store_accessor :quality_scores, :code_clarity, :naming_conventions, :code_organization
+  store_accessor :documentation_scores, :setup_instructions, :technical_decisions, :assumptions
+  store_accessor :technical_scores, :solution_correctness, :error_handling, :language_usage
+  store_accessor :problem_solving_scores, :completeness, :approach
+  store_accessor :testing_scores, :coverage, :quality, :edge_cases
+
+  # Initialize and convert scores before save
+  before_validation :process_scores
 
   # Score calculation methods
   def calculate_quality_score
@@ -60,5 +61,40 @@ class CodeReview < ApplicationRecord
     when 65..74 then "Fair - Junior candidate"
     else "Does not meet requirements"
     end
+  end
+
+  private
+
+  def process_scores
+    puts "\nProcessing scores before validation:"
+    puts "Before: #{attributes.slice(*score_attributes).inspect}"
+    
+    score_attributes.each do |attr|
+      current_scores = send(attr)
+      
+      # Convert the scores to a hash if needed
+      scores = case current_scores
+              when String
+                JSON.parse(current_scores) rescue {}
+              when ActionController::Parameters
+                current_scores.to_unsafe_h
+              when Hash
+                current_scores
+              else
+                {}
+              end
+      
+      # Ensure all values are integers
+      scores.transform_values! { |v| v.to_i }
+      
+      # Update the attribute
+      send("#{attr}=", scores)
+    end
+    
+    puts "After: #{attributes.slice(*score_attributes).inspect}"
+  end
+
+  def score_attributes
+    %w[quality_scores documentation_scores technical_scores problem_solving_scores testing_scores]
   end
 end 

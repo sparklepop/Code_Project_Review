@@ -96,4 +96,26 @@
       <p><%= @code_review.overall_comments %></p>
     </div>
   </div>
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <h2>Debug Information</h2>
+    </div>
+    <div class="card-body">
+      <h3>Quality Scores</h3>
+      <pre><%= @code_review.quality_scores.inspect %></pre>
+      
+      <h3>Documentation Scores</h3>
+      <pre><%= @code_review.documentation_scores.inspect %></pre>
+      
+      <h3>Technical Scores</h3>
+      <pre><%= @code_review.technical_scores.inspect %></pre>
+      
+      <h3>Problem Solving Scores</h3>
+      <pre><%= @code_review.problem_solving_scores.inspect %></pre>
+      
+      <h3>Testing Scores</h3>
+      <pre><%= @code_review.testing_scores.inspect %></pre>
+    </div>
+  </div>
 </div> 
