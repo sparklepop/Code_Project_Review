@@ -1,10 +1,18 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["submissionUrl", "form", "analyzeButton", "scoreInput"]
+  static targets = [
+    "submissionUrl", 
+    "form", 
+    "analyzeButton", 
+    "scoreInput",
+    "analysisProgress"
+  ]
 
   connect() {
     this.setupScoreInputs()
+    // Hide progress indicator on initial load
+    this.analysisProgressTarget.style.display = 'none'
   }
 
   setupScoreInputs() {
@@ -118,17 +126,14 @@ export default class extends Controller {
 
   setAnalyzing(analyzing) {
     const button = this.analyzeButtonTarget
-    const defaultText = button.querySelector('.default-text')
-    const analyzingText = button.querySelector('.analyzing-text')
+    const progress = this.analysisProgressTarget
 
     if (analyzing) {
       button.disabled = true
-      defaultText.classList.add('d-none')
-      analyzingText.classList.remove('d-none')
+      progress.style.display = 'block'
     } else {
       button.disabled = false
-      defaultText.classList.remove('d-none')
-      analyzingText.classList.add('d-none')
+      progress.style.display = 'none'
     }
   }
 
@@ -143,13 +148,9 @@ export default class extends Controller {
   }
 
   fillForm(data) {
-    this.debugFormFields();
     console.log("Filling form with data:", data);
 
     try {
-      // Remove previous indicators
-      this.clearUpdateIndicators();
-
       // Get all score input fields
       const scoreInputs = this.scoreInputTargets;
       console.log("Found score inputs:", scoreInputs.length);
@@ -161,7 +162,6 @@ export default class extends Controller {
         if (data[scoreType] && data[scoreType][scoreField] !== undefined) {
           console.log(`Setting ${scoreType}.${scoreField} to ${data[scoreType][scoreField]}`);
           input.value = data[scoreType][scoreField];
-          this.addUpdateIndicators(input);
         }
       });
 
@@ -169,7 +169,6 @@ export default class extends Controller {
       const commentsField = document.getElementById('code_review_overall_comments');
       if (commentsField && data.overall_comments) {
         commentsField.value = data.overall_comments;
-        this.addUpdateIndicators(commentsField);
       }
 
       console.log("Form filling completed");
@@ -177,27 +176,5 @@ export default class extends Controller {
       console.error("Error filling form:", error);
       this.showError("Error filling form with analysis results");
     }
-  }
-
-  clearUpdateIndicators() {
-    document.querySelectorAll('.field-updated').forEach(el => {
-      el.classList.remove('field-updated');
-    });
-    document.querySelectorAll('.field-updated-label').forEach(el => {
-      el.classList.remove('field-updated-label');
-    });
-  }
-
-  addUpdateIndicators(element) {
-    element.classList.add('field-updated');
-    const label = element.closest('.form-group').querySelector('label');
-    if (label) {
-      label.classList.add('field-updated-label');
-    }
-    
-    // Remove highlight after animation
-    setTimeout(() => {
-      element.classList.remove('field-updated');
-    }, 1000);
   }
 } 
