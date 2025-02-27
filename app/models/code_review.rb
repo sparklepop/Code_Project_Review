@@ -3,13 +3,6 @@ class CodeReview < ApplicationRecord
   validates :submission_url, presence: true
   validates :reviewer_name, presence: true
   
-  # Allow nested attributes
-  accepts_nested_attributes_for :quality_scores, 
-                              :documentation_scores, 
-                              :technical_scores, 
-                              :problem_solving_scores, 
-                              :testing_scores
-
   # Initialize empty hashes for scores if they're nil
   after_initialize do
     self.quality_scores ||= {}

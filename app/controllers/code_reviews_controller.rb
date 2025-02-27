@@ -84,30 +84,11 @@ class CodeReviewsController < ApplicationController
       :reviewer_name,
       :non_working_solution,
       :overall_comments,
-      quality_scores: [
-        :code_clarity,
-        :naming_conventions,
-        :code_organization
-      ],
-      documentation_scores: [
-        :setup_instructions,
-        :technical_decisions,
-        :assumptions
-      ],
-      technical_scores: [
-        :solution_correctness,
-        :error_handling,
-        :language_usage
-      ],
-      problem_solving_scores: [
-        :completeness,
-        :approach
-      ],
-      testing_scores: [
-        :coverage,
-        :quality,
-        :edge_cases
-      ]
+      quality_scores: {},
+      documentation_scores: {},
+      technical_scores: {},
+      problem_solving_scores: {},
+      testing_scores: {}
     )
   end
 end 

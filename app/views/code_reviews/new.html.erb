@@ -50,20 +50,18 @@
         <h2>Code Quality and Style (35 points)</h2>
       </div>
       <div class="card-body">
-        <%= f.fields_for :quality_scores do |quality| %>
-          <div class="form-group mb-3">
-            <label>Code Clarity (max 15)</label>
-            <%= f.number_field "quality_scores[code_clarity]", class: "form-control score-input", min: 0, max: 15 %>
-          </div>
-          <div class="form-group mb-3">
-            <label>Naming Conventions (max 10)</label>
-            <%= f.number_field "quality_scores[naming_conventions]", class: "form-control score-input", min: 0, max: 10 %>
-          </div>
-          <div class="form-group mb-3">
-            <label>Code Organization (max 10)</label>
-            <%= f.number_field "quality_scores[code_organization]", class: "form-control score-input", min: 0, max: 10 %>
-          </div>
-        <% end %>
+        <div class="form-group mb-3">
+          <label>Code Clarity (max 15)</label>
+          <%= f.number_field "quality_scores[code_clarity]", class: "form-control score-input", min: 0, max: 15 %>
+        </div>
+        <div class="form-group mb-3">
+          <label>Naming Conventions (max 10)</label>
+          <%= f.number_field "quality_scores[naming_conventions]", class: "form-control score-input", min: 0, max: 10 %>
+        </div>
+        <div class="form-group mb-3">
+          <label>Code Organization (max 10)</label>
+          <%= f.number_field "quality_scores[code_organization]", class: "form-control score-input", min: 0, max: 10 %>
+        </div>
       </div>
     </div>
 
@@ -72,20 +70,18 @@
         <h2>Documentation (20 points)</h2>
       </div>
       <div class="card-body">
-        <%= f.fields_for :documentation_scores do |doc| %>
-          <div class="form-group mb-3">
-            <label>Setup Instructions (max 8)</label>
-            <%= doc.number_field :setup_instructions, class: "form-control score-input", min: 0, max: 8 %>
-          </div>
-          <div class="form-group mb-3">
-            <label>Technical Decisions (max 7)</label>
-            <%= doc.number_field :technical_decisions, class: "form-control score-input", min: 0, max: 7 %>
-          </div>
-          <div class="form-group mb-3">
-            <label>Assumptions (max 5)</label>
-            <%= doc.number_field :assumptions, class: "form-control score-input", min: 0, max: 5 %>
-          </div>
-        <% end %>
+        <div class="form-group mb-3">
+          <label>Setup Instructions (max 8)</label>
+          <%= f.number_field "documentation_scores[setup_instructions]", class: "form-control score-input", min: 0, max: 8 %>
+        </div>
+        <div class="form-group mb-3">
+          <label>Technical Decisions (max 7)</label>
+          <%= f.number_field "documentation_scores[technical_decisions]", class: "form-control score-input", min: 0, max: 7 %>
+        </div>
+        <div class="form-group mb-3">
+          <label>Assumptions (max 5)</label>
+          <%= f.number_field "documentation_scores[assumptions]", class: "form-control score-input", min: 0, max: 5 %>
+        </div>
       </div>
     </div>
 
