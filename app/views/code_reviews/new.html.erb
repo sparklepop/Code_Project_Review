@@ -1,0 +1,75 @@
+<div class="container mt-4">
+  <h1>New Code Review</h1>
+
+  <%= form_with(model: @code_review, local: true, class: "review-form") do |f| %>
+    <div class="card mb-4">
+      <div class="card-header">
+        <h2>Basic Information</h2>
+      </div>
+      <div class="card-body">
+        <div class="form-group">
+          <%= f.label :candidate_name %>
+          <%= f.text_field :candidate_name, class: "form-control" %>
+        </div>
+
+        <div class="form-group">
+          <%= f.label :submission_url %>
+          <%= f.text_field :submission_url, class: "form-control" %>
+        </div>
+
+        <div class="form-group">
+          <%= f.label :reviewer_name %>
+          <%= f.text_field :reviewer_name, class: "form-control" %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Code Quality Section -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h2>Code Quality and Style (35 points)</h2>
+      </div>
+      <div class="card-body">
+        <%= f.fields_for :quality_scores do |quality| %>
+          <div class="form-group">
+            <label>Code Clarity (max 15)</label>
+            <%= quality.number_field :code_clarity, class: "form-control score-input",
+                                   min: 0, max: 15, data: { section: "quality" } %>
+          </div>
+          <!-- Add other quality fields similarly -->
+        <% end %>
+        <div class="section-total">Total: <span id="quality-total">0</span>/35</div>
+      </div>
+    </div>
+
+    <!-- Add similar cards for other sections -->
+
+    <div class="form-group">
+      <%= f.label :non_working_solution, class: "form-check-label" do %>
+        <%= f.check_box :non_working_solution, class: "form-check-input" %>
+        Non-working Solution (-30 points)
+      <% end %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :overall_comments %>
+      <%= f.text_area :overall_comments, class: "form-control" %>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header">
+        <h2>Final Score</h2>
+      </div>
+      <div class="card-body">
+        <div class="total-score">
+          Total Score: <span id="final-score">0</span>/115
+        </div>
+        <div class="assessment-level">
+          Assessment Level: <span id="assessment-level">Not yet calculated</span>
+        </div>
+      </div>
+    </div>
+
+    <%= f.submit "Submit Review", class: "btn btn-primary" %>
+  <% end %>
+</div> 

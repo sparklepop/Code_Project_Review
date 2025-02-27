@@ -1,0 +1,41 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Code Reviews</h1>
+    <%= link_to 'New Code Review', new_code_review_path, class: 'btn btn-primary' %>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Candidate</th>
+          <th>Reviewer</th>
+          <th>Total Score</th>
+          <th>Assessment</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @code_reviews.each do |review| %>
+          <tr>
+            <td><%= review.candidate_name %></td>
+            <td><%= review.reviewer_name %></td>
+            <td><%= review.calculate_total_score %></td>
+            <td><%= review.assessment_level %></td>
+            <td><%= review.created_at.strftime('%Y-%m-%d') %></td>
+            <td>
+              <%= link_to 'View', code_review_path(review), class: 'btn btn-sm btn-info' %>
+              <%= link_to 'Edit', edit_code_review_path(review), class: 'btn btn-sm btn-warning' %>
+              <%= link_to 'Delete', 
+                  code_review_path(review), 
+                  method: :delete,
+                  data: { confirm: 'Are you sure?' },
+                  class: 'btn btn-sm btn-danger' %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div> 
