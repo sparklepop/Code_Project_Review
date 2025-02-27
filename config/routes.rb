@@ -13,6 +13,9 @@ Rails.application.routes.draw do
   root 'code_reviews#index'
 
   resources :code_reviews do
+    collection do
+      post :analyze_submission
+    end
     member do
       get :download # For future PDF/export functionality
     end

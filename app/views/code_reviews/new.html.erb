@@ -1,7 +1,7 @@
-<div class="container mt-4">
+<div class="container mt-4" data-controller="code-review">
   <h1>New Code Review</h1>
 
-  <%= form_with(model: @code_review, local: true, class: "review-form") do |f| %>
+  <%= form_with(model: @code_review, local: true, class: "review-form", data: { target: "code-review.form" }) do |f| %>
     <% if @code_review.errors.any? %>
       <div class="alert alert-danger">
         <h2><%= pluralize(@code_review.errors.count, "error") %> prohibited this review from being saved:</h2>
@@ -25,7 +25,17 @@
 
         <div class="form-group mb-3">
           <%= f.label :submission_url %>
-          <%= f.text_field :submission_url, class: "form-control" %>
+          <%= f.text_field :submission_url, 
+                          class: "form-control", 
+                          data: { target: "code-review.submissionUrl" } %>
+          <button type="button" 
+                  class="btn btn-secondary mt-2" 
+                  data-action="click->code-review#analyze"
+                  data-code-review-target="analyzeButton">
+            <span class="default-text">Analyze Code</span>
+            <span class="analyzing-text d-none">Analyzing...</span>
+          </button>
+          <!-- Errors will be inserted here -->
         </div>
 
         <div class="form-group mb-3">
@@ -43,15 +53,15 @@
         <%= f.fields_for :quality_scores do |quality| %>
           <div class="form-group mb-3">
             <label>Code Clarity (max 15)</label>
-            <%= quality.number_field :code_clarity, class: "form-control score-input", min: 0, max: 15 %>
+            <%= f.number_field "quality_scores[code_clarity]", class: "form-control score-input", min: 0, max: 15 %>
           </div>
           <div class="form-group mb-3">
             <label>Naming Conventions (max 10)</label>
-            <%= quality.number_field :naming_conventions, class: "form-control score-input", min: 0, max: 10 %>
+            <%= f.number_field "quality_scores[naming_conventions]", class: "form-control score-input", min: 0, max: 10 %>
           </div>
           <div class="form-group mb-3">
             <label>Code Organization (max 10)</label>
-            <%= quality.number_field :code_organization, class: "form-control score-input", min: 0, max: 10 %>
+            <%= f.number_field "quality_scores[code_organization]", class: "form-control score-input", min: 0, max: 10 %>
           </div>
         <% end %>
       </div>

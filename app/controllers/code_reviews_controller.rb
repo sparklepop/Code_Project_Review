@@ -10,10 +10,14 @@ class CodeReviewsController < ApplicationController
   def create
     @code_review = CodeReview.new(code_review_params)
     
+    Rails.logger.debug("Attempting to save code review with params: #{code_review_params.inspect}")
+    
     if @code_review.save
+      Rails.logger.info("Successfully saved code review ##{@code_review.id}")
       redirect_to @code_review, notice: 'Code review was successfully created.'
     else
-      render :new
+      Rails.logger.error("Failed to save code review: #{@code_review.errors.full_messages}")
+      render :new, status: :unprocessable_entity
     end
   end
 
@@ -47,6 +51,30 @@ class CodeReviewsController < ApplicationController
     # TODO: Implement download functionality
   end
 
+  def analyze_submission
+    begin
+      submission_url = params.dig(:code_review, :submission_url)
+      
+      if submission_url.blank?
+        render json: { error: "Submission URL is required" }, status: :unprocessable_entity
+        return
+      end
+
+      analyzer = Ai::CodeReviewer.new(submission_url)
+      analysis = analyzer.analyze
+      
+      if analysis.present?
+        render json: analysis
+      else
+        render json: { error: "Analysis failed" }, status: :unprocessable_entity
+      end
+    rescue StandardError => e
+      Rails.logger.error("Analysis error: #{e.message}")
+      Rails.logger.error(e.backtrace.join("\n"))
+      render json: { error: "Analysis failed: #{e.message}" }, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def code_review_params
@@ -56,11 +84,30 @@ class CodeReviewsController < ApplicationController
       :reviewer_name,
       :non_working_solution,
       :overall_comments,
-      quality_scores: {},
-      documentation_scores: {},
-      technical_scores: {},
-      problem_solving_scores: {},
-      testing_scores: {}
+      quality_scores: [
+        :code_clarity,
+        :naming_conventions,
+        :code_organization
+      ],
+      documentation_scores: [
+        :setup_instructions,
+        :technical_decisions,
+        :assumptions
+      ],
+      technical_scores: [
+        :solution_correctness,
+        :error_handling,
+        :language_usage
+      ],
+      problem_solving_scores: [
+        :completeness,
+        :approach
+      ],
+      testing_scores: [
+        :coverage,
+        :quality,
+        :edge_cases
+      ]
     )
   end
 end 
