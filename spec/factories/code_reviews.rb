@@ -1,10 +1,34 @@
 FactoryBot.define do
   factory :code_review do
-    candidate_name { Faker::Name.name }
-    submission_url { Faker::Internet.url }
-    reviewer_name { Faker::Name.name }
+    candidate_name { "John Doe" }
+    reviewer_name { "Jane Smith" }
+    submission_url { "https://github.com/example/project" }
+    quality_scores { { 
+      "code_clarity" => "12",
+      "naming_conventions" => "8",
+      "code_organization" => "9"
+    } }
+    documentation_scores { {
+      "setup_instructions" => "7",
+      "technical_decisions" => "6",
+      "assumptions" => "4"
+    } }
+    technical_scores { {
+      "solution_correctness" => "13",
+      "error_handling" => "4",
+      "language_usage" => "4"
+    } }
+    problem_solving_scores { {
+      "completeness" => "9",
+      "approach" => "8"
+    } }
+    testing_scores { {
+      "coverage" => "6",
+      "quality" => "4",
+      "edge_cases" => "2"
+    } }
     non_working_solution { false }
-    overall_comments { Faker::Lorem.paragraph }
+    overall_comments { "Good work overall with attention to detail." }
 
     trait :outstanding do
       quality_scores { {

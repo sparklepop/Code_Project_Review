@@ -1,10 +1,13 @@
 require 'rails_helper'
 
-RSpec.describe CodeReview do
+RSpec.describe CodeReview, type: :model do
   describe 'validations' do
-    it { should validate_presence_of(:candidate_name) }
-    it { should validate_presence_of(:submission_url) }
-    it { should validate_presence_of(:reviewer_name) }
+    subject { build(:code_review) }
+    
+    it { is_expected.to validate_presence_of(:candidate_name) }
+    it { is_expected.to validate_presence_of(:submission_url) }
+    it { is_expected.to validate_presence_of(:reviewer_name) }
+    it { is_expected.to validate_presence_of(:quality_scores) }
   end
 
   describe 'score calculations' do
@@ -97,5 +100,31 @@ RSpec.describe CodeReview do
       before { allow(code_review).to receive(:calculate_total_score).and_return(64) }
       it { expect(code_review.assessment_level).to eq("Does not meet requirements") }
     end
+  end
+
+  describe "#calculate_total_score" do
+    let(:code_review) do
+      create(:code_review,
+        quality_scores: { "code_clarity" => "12", "naming_conventions" => "8", "code_organization" => "9" },
+        documentation_scores: { "setup_instructions" => "7", "technical_decisions" => "6", "assumptions" => "4" },
+        technical_scores: { "solution_correctness" => "13", "error_handling" => "4", "language_usage" => "4" },
+        problem_solving_scores: { "completeness" => "9", "approach" => "8" },
+        testing_scores: { "coverage" => "6", "quality" => "4", "edge_cases" => "2" }
+      )
+    end
+
+    it "calculates the total score correctly" do
+      expect(code_review.calculate_total_score).to eq(96)
+    end
+  end
+
+  describe "#assessment_level" do
+    it "returns 'Outstanding' for scores 95-115" do
+      code_review = build(:code_review)
+      allow(code_review).to receive(:calculate_total_score).and_return(95)
+      expect(code_review.assessment_level).to eq("Outstanding - Strong Senior+ candidate")
+    end
+
+    # Add more test cases for other score ranges
   end
 end 
