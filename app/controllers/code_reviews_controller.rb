@@ -162,17 +162,25 @@ class CodeReviewsController < ApplicationController
   private
 
   def code_review_params
-    params.require(:code_review).permit(
+    processed_params = params.require(:code_review).permit(
       :candidate_name,
       :submission_url,
       :reviewer_name,
       :non_working_solution,
-      :overall_comments,
-      quality_scores: [:code_clarity, :naming_conventions, :code_organization],
-      documentation_scores: [:setup_instructions, :technical_decisions, :assumptions],
-      technical_scores: [:solution_correctness, :error_handling, :language_usage],
-      problem_solving_scores: [:completeness, :approach],
-      testing_scores: [:coverage, :quality, :edge_cases]
-    )
+      :overall_comments
+    ).to_h
+
+    # Handle score parameters
+    score_types = %w[quality_scores documentation_scores technical_scores problem_solving_scores testing_scores]
+    
+    score_types.each do |type|
+      processed_params[type] = params[:code_review].fetch(type, {}).permit!.to_h
+    end
+
+    puts "\n=== PROCESSED PARAMS ==="
+    puts JSON.pretty_generate(processed_params)
+    puts "======================="
+
+    processed_params
   end
 end 

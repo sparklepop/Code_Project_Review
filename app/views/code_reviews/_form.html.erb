@@ -55,7 +55,7 @@
     <div class="card-body">
       <div class="form-group">
         <div class="score-label">
-          <%= f.number_field "quality_scores[code_clarity]", 
+          <%= f.number_field "quality_scores][code_clarity", 
                             value: code_review.quality_scores["code_clarity"],
                             class: "form-control score-input",
                             min: 0,
@@ -70,7 +70,7 @@
       </div>
       <div class="form-group">
         <div class="score-label">
-          <%= f.number_field "quality_scores[naming_conventions]", 
+          <%= f.number_field "quality_scores][naming_conventions", 
                             value: code_review.quality_scores["naming_conventions"],
                             class: "form-control score-input",
                             min: 0,
@@ -85,7 +85,7 @@
       </div>
       <div class="form-group">
         <div class="score-label">
-          <%= f.number_field "quality_scores[code_organization]", 
+          <%= f.number_field "quality_scores][code_organization", 
                             value: code_review.quality_scores["code_organization"],
                             class: "form-control score-input",
                             min: 0,
@@ -108,7 +108,7 @@
     <div class="card-body">
       <div class="form-group">
         <div class="score-label">
-          <%= f.number_field "documentation_scores[setup_instructions]", 
+          <%= f.number_field "documentation_scores][setup_instructions", 
                             value: code_review.documentation_scores["setup_instructions"],
                             class: "form-control score-input",
                             min: 0,
@@ -123,7 +123,7 @@
       </div>
       <div class="form-group">
         <div class="score-label">
-          <%= f.number_field "documentation_scores[technical_decisions]", 
+          <%= f.number_field "documentation_scores][technical_decisions", 
                             value: code_review.documentation_scores["technical_decisions"],
                             class: "form-control score-input",
                             min: 0,
@@ -138,7 +138,7 @@
       </div>
       <div class="form-group">
         <div class="score-label">
-          <%= f.number_field "documentation_scores[assumptions]", 
+          <%= f.number_field "documentation_scores][assumptions", 
                             value: code_review.documentation_scores["assumptions"],
                             class: "form-control score-input",
                             min: 0,
@@ -161,7 +161,7 @@
     <div class="card-body">
       <div class="form-group">
         <div class="score-label">
-          <%= f.number_field "technical_scores[solution_correctness]", 
+          <%= f.number_field "technical_scores][solution_correctness", 
                             value: code_review.technical_scores["solution_correctness"],
                             class: "form-control score-input",
                             min: 0, max: 15,
@@ -173,7 +173,7 @@
       </div>
       <div class="form-group">
         <div class="score-label">
-          <%= f.number_field "technical_scores[error_handling]", 
+          <%= f.number_field "technical_scores][error_handling", 
                             value: code_review.technical_scores["error_handling"],
                             class: "form-control score-input",
                             min: 0, max: 5,
@@ -185,7 +185,7 @@
       </div>
       <div class="form-group">
         <div class="score-label">
-          <%= f.number_field "technical_scores[language_usage]", 
+          <%= f.number_field "technical_scores][language_usage", 
                             value: code_review.technical_scores["language_usage"],
                             class: "form-control score-input",
                             min: 0, max: 5,
@@ -205,7 +205,7 @@
     <div class="card-body">
       <div class="form-group">
         <div class="score-label">
-          <%= f.number_field "problem_solving_scores[completeness]", 
+          <%= f.number_field "problem_solving_scores][completeness", 
                             value: code_review.problem_solving_scores["completeness"],
                             class: "form-control score-input",
                             min: 0, max: 10,
@@ -217,7 +217,7 @@
       </div>
       <div class="form-group">
         <div class="score-label">
-          <%= f.number_field "problem_solving_scores[approach]", 
+          <%= f.number_field "problem_solving_scores][approach", 
                             value: code_review.problem_solving_scores["approach"],
                             class: "form-control score-input",
                             min: 0, max: 10,
@@ -237,7 +237,7 @@
     <div class="card-body">
       <div class="form-group">
         <div class="score-label">
-          <%= f.number_field "testing_scores[coverage]", 
+          <%= f.number_field "testing_scores][coverage", 
                             value: code_review.testing_scores["coverage"],
                             class: "form-control score-input",
                             min: 0, max: 7,
@@ -249,7 +249,7 @@
       </div>
       <div class="form-group">
         <div class="score-label">
-          <%= f.number_field "testing_scores[quality]", 
+          <%= f.number_field "testing_scores][quality", 
                             value: code_review.testing_scores["quality"],
                             class: "form-control score-input",
                             min: 0, max: 5,
@@ -261,7 +261,7 @@
       </div>
       <div class="form-group">
         <div class="score-label">
-          <%= f.number_field "testing_scores[edge_cases]", 
+          <%= f.number_field "testing_scores][edge_cases", 
                             value: code_review.testing_scores["edge_cases"],
                             class: "form-control score-input",
                             min: 0, max: 3,
