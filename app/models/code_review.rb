@@ -3,6 +3,10 @@ class CodeReview < ApplicationRecord
   validates :submission_url, presence: true
   validates :reviewer_name, presence: true
   validates :quality_scores, presence: true
+  validates :repository_url, presence: true, format: { 
+    with: %r{\Ahttps://github\.com/[^/]+/[^/]+\z},
+    message: "must be a valid GitHub repository URL"
+  }
   
   # Add accessors for score attributes
   store_accessor :quality_scores, :code_clarity, :naming_conventions, :code_organization
@@ -13,6 +17,13 @@ class CodeReview < ApplicationRecord
 
   # Initialize and convert scores before save
   before_validation :process_scores
+
+  enum status: {
+    pending: 0,
+    processing: 1,
+    completed: 2,
+    failed: 3
+  }
 
   # Score calculation methods
   def calculate_quality_score
@@ -70,6 +81,10 @@ class CodeReview < ApplicationRecord
 
   def self.permitted_documentation_score_keys
     %w[setup_instructions setup_instructions_reason technical_decisions technical_decisions_reason assumptions assumptions_reason]
+  end
+
+  def queue_analysis
+    CodeReviewAnalysisJob.perform_later(self)
   end
 
   private

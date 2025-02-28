@@ -7,6 +7,15 @@
   </div>
 
   <div class="review-form-container">
-    <%= render 'form', code_review: @code_review %>
+    <%= form_with(model: @code_review, local: true) do |f| %>
+      <div class="field">
+        <%= f.label :repository_url, "GitHub Repository URL" %>
+        <%= f.text_field :repository_url, 
+                         placeholder: "https://github.com/username/repository",
+                         required: true %>
+      </div>
+      
+      <%= f.submit "Start Code Review", class: "button" %>
+    <% end %>
   </div>
 </div> 
