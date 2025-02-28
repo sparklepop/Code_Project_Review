@@ -1,0 +1,33 @@
+<div class="analysis-results">
+  <!-- Code Quality -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h2>Code Quality (<%= results[:quality_total] %> / 35)</h2>
+    </div>
+    <div class="card-body">
+      <%= render 'score_section', scores: results[:quality_scores] %>
+    </div>
+  </div>
+
+  <!-- Documentation -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h2>Documentation (<%= results[:documentation_total] %> / 20)</h2>
+    </div>
+    <div class="card-body">
+      <%= render 'score_section', scores: results[:documentation_scores] %>
+    </div>
+  </div>
+
+  <!-- Similar sections for other categories... -->
+
+  <!-- Analysis Details -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h2>Detailed Analysis</h2>
+    </div>
+    <div class="card-body">
+      <pre class="analysis-details"><%= results[:overall_comments] %></pre>
+    </div>
+  </div>
+</div> 
