@@ -1,5 +1,7 @@
 module Ai
   class CodeReviewer
+    include CodeAnalysisHelpers
+
     def initialize(submission_url)
       @submission_url = submission_url
       @repo_content = fetch_repository_content
@@ -8,14 +10,17 @@ module Ai
     def analyze
       Rails.logger.debug "Starting code analysis..."
       
-      # This would be replaced with actual AI analysis
+      @languages = LanguageDetector.detect_languages(@repo_content)
+      Rails.logger.debug "Detected languages: #{@languages.join(', ')}"
+
       results = {
         quality_scores: analyze_code_quality,
         documentation_scores: analyze_documentation,
         technical_scores: analyze_technical_implementation,
         problem_solving_scores: analyze_problem_solving,
         testing_scores: analyze_testing,
-        overall_comments: generate_overall_comments
+        overall_comments: generate_overall_comments,
+        languages: @languages
       }
 
       Rails.logger.debug "Analysis results: #{results.inspect}"
@@ -33,48 +38,82 @@ module Ai
     end
 
     def analyze_code_quality
-      # This would actually analyze the code and provide real reasoning
+      # Group files by language
+      files_by_language = @repo_content.group_by do |path, _|
+        LanguageDetector.language_from_path(path)
+      end
+
+      # Analyze each language with appropriate analyzer
+      clarity_scores = []
+      naming_scores = []
+      organization_scores = []
+
+      files_by_language.each do |language, files|
+        next unless language # Skip unknown languages
+        
+        analyzer = code_analyzer_for(language)
+        results = analyzer.analyze(files)
+        
+        clarity_scores << results.clarity_score
+        naming_scores << results.naming_score
+        organization_scores << results.organization_score
+        
+        @clarity_reasons ||= []
+        @clarity_reasons.concat(results.clarity_reasons)
+      end
+
       {
-        code_clarity: analyze_code_clarity,
-        code_clarity_reason: provide_clarity_reasoning,
-        naming_conventions: analyze_naming_conventions,
-        naming_conventions_reason: provide_naming_reasoning,
-        code_organization: analyze_code_organization,
-        code_organization_reason: provide_organization_reasoning
+        code_clarity: average_score(clarity_scores),
+        code_clarity_reason: @clarity_reasons,
+        naming_conventions: average_score(naming_scores),
+        naming_conventions_reason: @naming_reasons,
+        code_organization: average_score(organization_scores),
+        code_organization_reason: @organization_reasons
       }
     end
 
-    def analyze_code_clarity
-      # Example of what the real implementation would do:
-      # - Check method lengths
-      # - Analyze method complexity
-      # - Check for clear method names
-      # - Look for single responsibility principle
-      score = calculate_clarity_score
-      @clarity_reasons = generate_clarity_reasons  # Store reasons for later
-      score
+    def code_analyzer_for(language)
+      case language
+      when :ruby
+        RubyAnalyzer.new
+      when :javascript
+        JavaScriptAnalyzer.new
+      when :python
+        PythonAnalyzer.new
+      # Add more languages as needed
+      else
+        GenericAnalyzer.new
+      end
     end
 
-    def provide_clarity_reasoning
-      # Use the analysis results to provide specific examples
-      "Methods are well-named and follow single responsibility principle. " \
-      "For example, the `#{@clarity_reasons[:good_example]}` method clearly handles one task."
+    def average_score(scores)
+      return 0 if scores.empty?
+      (scores.sum.to_f / scores.size).round
     end
 
-    def analyze_naming_conventions
-      8 # Sample score out of 10
+    def analyze_code_clarity(files)
+      @clarity_reasons = []
+      
+      files.each do |path, file|
+        # Analyze method lengths
+        analyze_method_lengths(path, file[:content])
+        # Check method complexity
+        analyze_method_complexity(path, file[:content])
+        # Evaluate single responsibility
+        analyze_single_responsibility(path, file[:content])
+      end
+
+      calculate_clarity_score
     end
 
-    def provide_naming_reasoning
-      "Variables and methods follow Ruby conventions, though some model names could be more descriptive."
+    def analyze_naming_conventions(files)
+      # Implement naming conventions analysis
+      8 # Placeholder score
     end
 
-    def analyze_code_organization
-      9 # Sample score out of 10
-    end
-
-    def provide_organization_reasoning
-      "Code is logically organized into modules and classes with clear separation of concerns."
+    def analyze_code_organization(files)
+      # Implement code organization analysis
+      9 # Placeholder score
     end
 
     def analyze_setup_instructions
@@ -153,11 +192,6 @@ module Ai
     def calculate_clarity_score
       # TODO: Implement actual analysis
       12 # Placeholder score
-    end
-
-    def generate_clarity_reasons
-      # TODO: Implement actual analysis
-      { good_example: 'process_order' } # Placeholder example
     end
 
     def analyze_documentation

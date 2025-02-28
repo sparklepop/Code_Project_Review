@@ -67,5 +67,3 @@ group :test do
   gem 'shoulda-matchers'
   gem 'rails-controller-testing'
 end
-
-gem 'octokit', '~> 6.1'
