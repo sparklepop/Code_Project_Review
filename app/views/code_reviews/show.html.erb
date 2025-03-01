@@ -26,7 +26,7 @@
       </div>
       <div class="row mb-3">
         <div class="col-md-3"><strong>Total Score:</strong></div>
-        <div class="col-md-9"><%= @code_review.calculate_total_score %> / 115</div>
+        <div class="col-md-9"><%= @code_review.total_score %> / 115</div>
       </div>
       <div class="row mb-3">
         <div class="col-md-3"><strong>Assessment Level:</strong></div>
@@ -40,37 +40,46 @@
       <h2>Scores Breakdown</h2>
     </div>
     <div class="card-body">
-      <!-- Code Quality -->
+      <!-- Code Clarity -->
       <div class="card mb-4">
         <div class="card-header">
-          <h2>Code Quality and Style (<%= @code_review.calculate_quality_score %> / 35)</h2>
+          <h2>Code Clarity (<%= @code_review.clarity_scores["total_score"] %> / 35)</h2>
         </div>
         <div class="card-body">
           <div class="ms-4 mb-3">
             <div class="row mb-3">
-              <div class="col-md-2">Code Clarity:</div>
-              <div class="col-md-2"><%= @code_review.quality_scores["code_clarity"] %> / 15</div>
-              <div class="col-md-2">Reason:</div>
+              <div class="col-md-2">Method Simplicity:</div>
+              <div class="col-md-2"><%= @code_review.clarity_scores.dig("method_simplicity", "score") %> / 10</div>
+              <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
-                <%= @code_review.quality_scores["code_clarity_reason"] %>
+                <%= @code_review.clarity_scores.dig("method_simplicity", "feedback") %>
               </div>
             </div>
 
             <div class="row mb-3">
               <div class="col-md-2">Naming Conventions:</div>
-              <div class="col-md-2"><%= @code_review.quality_scores["naming_conventions"] %> / 10</div>
-              <div class="col-md-2">Reason:</div>
+              <div class="col-md-2"><%= @code_review.clarity_scores.dig("naming_conventions", "score") %> / 10</div>
+              <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
-                <%= @code_review.quality_scores["naming_conventions_reason"] %>
+                <%= @code_review.clarity_scores.dig("naming_conventions", "feedback") %>
               </div>
             </div>
 
             <div class="row mb-3">
               <div class="col-md-2">Code Organization:</div>
-              <div class="col-md-2"><%= @code_review.quality_scores["code_organization"] %> / 10</div>
-              <div class="col-md-2">Reason:</div>
+              <div class="col-md-2"><%= @code_review.clarity_scores.dig("code_organization", "score") %> / 10</div>
+              <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
-                <%= @code_review.quality_scores["code_organization_reason"] %>
+                <%= @code_review.clarity_scores.dig("code_organization", "feedback") %>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-2">Comments Quality:</div>
+              <div class="col-md-2"><%= @code_review.clarity_scores.dig("comments_quality", "score") %> / 5</div>
+              <div class="col-md-2">Feedback:</div>
+              <div class="col-md-6 text-secondary">
+                <%= @code_review.clarity_scores.dig("comments_quality", "feedback") %>
               </div>
             </div>
           </div>
@@ -80,71 +89,80 @@
       <!-- Documentation -->
       <div class="card mb-4">
         <div class="card-header">
-          <h2>Documentation (<%= @code_review.calculate_documentation_score %> / 20)</h2>
+          <h2>Documentation (<%= @code_review.practices_scores["total_score"] %> / 25)</h2>
         </div>
         <div class="card-body">
           <div class="ms-4 mb-3">
             <div class="row mb-3">
-              <div class="col-md-2">Setup Instructions:</div>
-              <div class="col-md-2"><%= @code_review.documentation_scores["setup_instructions"] %> / 8</div>
-              <div class="col-md-2">Reason:</div>
+              <div class="col-md-2">Commit Quality:</div>
+              <div class="col-md-2"><%= @code_review.practices_scores.dig("commit_quality", "score") %> / 10</div>
+              <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
-                <%= @code_review.documentation_scores["setup_instructions_reason"] %>
+                <%= @code_review.practices_scores.dig("commit_quality", "feedback") %>
               </div>
             </div>
 
             <div class="row mb-3">
-              <div class="col-md-2">Technical Decisions:</div>
-              <div class="col-md-2"><%= @code_review.documentation_scores["technical_decisions"] %> / 7</div>
-              <div class="col-md-2">Reason:</div>
+              <div class="col-md-2">Basic Testing:</div>
+              <div class="col-md-2"><%= @code_review.practices_scores.dig("basic_testing", "score") %> / 10</div>
+              <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
-                <%= @code_review.documentation_scores["technical_decisions_reason"] %>
+                <%= @code_review.practices_scores.dig("basic_testing", "feedback") %>
               </div>
             </div>
 
             <div class="row mb-3">
-              <div class="col-md-2">Assumptions:</div>
-              <div class="col-md-2"><%= @code_review.documentation_scores["assumptions"] %> / 5</div>
-              <div class="col-md-2">Reason:</div>
+              <div class="col-md-2">Documentation:</div>
+              <div class="col-md-2"><%= @code_review.practices_scores.dig("documentation", "score") %> / 5</div>
+              <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
-                <%= @code_review.documentation_scores["assumptions_reason"] %>
+                <%= @code_review.practices_scores.dig("documentation", "feedback") %>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Technical Implementation -->
+      <!-- Architecture -->
       <div class="card mb-4">
         <div class="card-header">
-          <h2>Technical Implementation (<%= @code_review.calculate_technical_score %> / 25)</h2>
+          <h2>Architecture (<%= @code_review.architecture_scores["total_score"] %> / 25)</h2>
         </div>
         <div class="card-body">
           <div class="ms-4 mb-3">
             <div class="row mb-3">
-              <div class="col-md-2">Solution Correctness:</div>
-              <div class="col-md-2"><%= @code_review.technical_scores["solution_correctness"] %> / 15</div>
-              <div class="col-md-2">Reason:</div>
+              <div class="col-md-2">Separation of Concerns:</div>
+              <div class="col-md-2"><%= @code_review.architecture_scores.dig("separation_of_concerns", "score") %> / 10</div>
+              <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
-                <%= @code_review.technical_scores["solution_correctness_reason"] %>
+                <%= @code_review.architecture_scores.dig("separation_of_concerns", "feedback") %>
               </div>
             </div>
 
             <div class="row mb-3">
-              <div class="col-md-2">Error Handling:</div>
-              <div class="col-md-2"><%= @code_review.technical_scores["error_handling"] %> / 5</div>
-              <div class="col-md-2">Reason:</div>
+              <div class="col-md-2">File Organization:</div>
+              <div class="col-md-2"><%= @code_review.architecture_scores.dig("file_organization", "score") %> / 5</div>
+              <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
-                <%= @code_review.technical_scores["error_handling_reason"] %>
+                <%= @code_review.architecture_scores.dig("file_organization", "feedback") %>
               </div>
             </div>
 
             <div class="row mb-3">
-              <div class="col-md-2">Language Usage:</div>
-              <div class="col-md-2"><%= @code_review.technical_scores["language_usage"] %> / 5</div>
-              <div class="col-md-2">Reason:</div>
+              <div class="col-md-2">Dependency Management:</div>
+              <div class="col-md-2"><%= @code_review.architecture_scores.dig("dependency_management", "score") %> / 5</div>
+              <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
-                <%= @code_review.technical_scores["language_usage_reason"] %>
+                <%= @code_review.architecture_scores.dig("dependency_management", "feedback") %>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-2">Framework Usage:</div>
+              <div class="col-md-2"><%= @code_review.architecture_scores.dig("framework_usage", "score") %> / 5</div>
+              <div class="col-md-2">Feedback:</div>
+              <div class="col-md-6 text-secondary">
+                <%= @code_review.architecture_scores.dig("framework_usage", "feedback") %>
               </div>
             </div>
           </div>
@@ -154,62 +172,62 @@
       <!-- Problem Solving -->
       <div class="card mb-4">
         <div class="card-header">
-          <h2>Problem Solving (<%= @code_review.calculate_problem_solving_score %> / 20)</h2>
+          <h2>Problem Solving (<%= @code_review.problem_solving_scores["total_score"] %> / 15)</h2>
         </div>
         <div class="card-body">
           <div class="ms-4 mb-3">
             <div class="row mb-3">
-              <div class="col-md-2">Completeness:</div>
-              <div class="col-md-2"><%= @code_review.problem_solving_scores["completeness"] %> / 10</div>
-              <div class="col-md-2">Reason:</div>
+              <div class="col-md-2">Solution Simplicity:</div>
+              <div class="col-md-2"><%= @code_review.problem_solving_scores.dig("solution_simplicity", "score") %> / 10</div>
+              <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
-                <%= @code_review.problem_solving_scores["completeness_reason"] %>
+                <%= @code_review.problem_solving_scores.dig("solution_simplicity", "feedback") %>
               </div>
             </div>
 
             <div class="row mb-3">
-              <div class="col-md-2">Approach:</div>
-              <div class="col-md-2"><%= @code_review.problem_solving_scores["approach"] %> / 10</div>
-              <div class="col-md-2">Reason:</div>
+              <div class="col-md-2">Code Reuse:</div>
+              <div class="col-md-2"><%= @code_review.problem_solving_scores.dig("code_reuse", "score") %> / 5</div>
+              <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
-                <%= @code_review.problem_solving_scores["approach_reason"] %>
+                <%= @code_review.problem_solving_scores.dig("code_reuse", "feedback") %>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Testing Bonus -->
+      <!-- Bonus Points -->
       <div class="card mb-4">
         <div class="card-header">
-          <h2>Testing Bonus (<%= @code_review.calculate_testing_bonus %> / 15)</h2>
+          <h2>Bonus Points (<%= @code_review.bonus_scores["total_score"] %> / 15)</h2>
         </div>
         <div class="card-body">
           <div class="ms-4 mb-3">
             <div class="row mb-3">
-              <div class="col-md-2">Coverage:</div>
-              <div class="col-md-2"><%= @code_review.testing_scores["coverage"] %> / 7</div>
-              <div class="col-md-2">Reason:</div>
+              <div class="col-md-2">Advanced Testing:</div>
+              <div class="col-md-2"><%= @code_review.bonus_scores.dig("advanced_testing", "score") %> / 5</div>
+              <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
-                <%= @code_review.testing_scores["coverage_reason"] %>
+                <%= @code_review.bonus_scores.dig("advanced_testing", "feedback") %>
               </div>
             </div>
 
             <div class="row mb-3">
-              <div class="col-md-2">Quality:</div>
-              <div class="col-md-2"><%= @code_review.testing_scores["quality"] %> / 5</div>
-              <div class="col-md-2">Reason:</div>
+              <div class="col-md-2">Security Practices:</div>
+              <div class="col-md-2"><%= @code_review.bonus_scores.dig("security_practices", "score") %> / 5</div>
+              <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
-                <%= @code_review.testing_scores["quality_reason"] %>
+                <%= @code_review.bonus_scores.dig("security_practices", "feedback") %>
               </div>
             </div>
 
             <div class="row mb-3">
-              <div class="col-md-2">Edge Cases:</div>
-              <div class="col-md-2"><%= @code_review.testing_scores["edge_cases"] %> / 3</div>
-              <div class="col-md-2">Reason:</div>
+              <div class="col-md-2">Performance:</div>
+              <div class="col-md-2"><%= @code_review.bonus_scores.dig("performance_considerations", "score") %> / 5</div>
+              <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
-                <%= @code_review.testing_scores["edge_cases_reason"] %>
+                <%= @code_review.bonus_scores.dig("performance_considerations", "feedback") %>
               </div>
             </div>
           </div>
@@ -247,4 +265,10 @@
       <i class="fas fa-trash-alt" style="padding-right: 12px;"></i>Delete Review
     <% end %>
   </div>
-</div> 
+</div>
+
+<% Rails.logger.debug "Clarity Scores: #{@code_review.clarity_scores.inspect}" %>
+<% Rails.logger.debug "Architecture Scores: #{@code_review.architecture_scores.inspect}" %>
+<% Rails.logger.debug "Practices Scores: #{@code_review.practices_scores.inspect}" %>
+<% Rails.logger.debug "Problem Solving Scores: #{@code_review.problem_solving_scores.inspect}" %>
+<% Rails.logger.debug "Bonus Scores: #{@code_review.bonus_scores.inspect}" %> 

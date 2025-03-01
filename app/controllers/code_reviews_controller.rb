@@ -1,4 +1,6 @@
 class CodeReviewsController < ApplicationController
+  before_action :set_code_review, only: [:show, :edit, :update, :destroy]
+
   def index
     @code_reviews = CodeReview.all
   end
@@ -23,41 +25,23 @@ class CodeReviewsController < ApplicationController
   end
 
   def edit
-    @code_review = CodeReview.find(params[:id])
-    puts "\n=== LOADING EDIT FORM ==="
-    puts "Quality Scores: #{@code_review.quality_scores.inspect}"
-    puts "Documentation Scores: #{@code_review.documentation_scores.inspect}"
-    puts "Technical Scores: #{@code_review.technical_scores.inspect}"
-    puts "Problem Solving Scores: #{@code_review.problem_solving_scores.inspect}"
-    puts "Testing Scores: #{@code_review.testing_scores.inspect}"
-    puts "======================="
+    Rails.logger.debug "\n=== LOADING EDIT FORM ==="
+    Rails.logger.debug "Clarity Scores: #{@code_review.clarity_scores.inspect}"
+    Rails.logger.debug "Architecture Scores: #{@code_review.architecture_scores.inspect}"
+    Rails.logger.debug "Practices Scores: #{@code_review.practices_scores.inspect}"
+    Rails.logger.debug "Problem Solving Scores: #{@code_review.problem_solving_scores.inspect}"
+    Rails.logger.debug "Bonus Scores: #{@code_review.bonus_scores.inspect}"
   end
 
   def update
-    @code_review = CodeReview.find(params[:id])
-    
-    puts "\n=== UPDATE PARAMS ==="
-    puts JSON.pretty_generate(params.to_unsafe_h)
-    puts "======================="
-
-    if @code_review.update(code_review_params)
-      puts "\n=== UPDATED IN DATABASE ==="
-      puts "ID: #{@code_review.id}"
-      puts "Quality Scores: #{@code_review.quality_scores.inspect}"
-      puts "Documentation Scores: #{@code_review.documentation_scores.inspect}"
-      puts "Technical Scores: #{@code_review.technical_scores.inspect}"
-      puts "Problem Solving Scores: #{@code_review.problem_solving_scores.inspect}"
-      puts "Testing Scores: #{@code_review.testing_scores.inspect}"
-      puts "======================="
-      
-      redirect_to @code_review, notice: 'Code review was successfully updated.'
-    else
-      puts "\n=== UPDATE FAILED ==="
-      puts "Errors: #{@code_review.errors.full_messages}"
-      puts "Current attributes: #{@code_review.attributes.inspect}"
-      puts "======================="
-      
-      render :edit, status: :unprocessable_entity
+    respond_to do |format|
+      if @code_review.update(code_review_params)
+        format.html { redirect_to @code_review, notice: 'Code review was successfully updated.' }
+        format.json { render :show, status: :ok, location: @code_review }
+      else
+        format.html { render :edit }
+        format.json { render json: @code_review.errors, status: :unprocessable_entity }
+      end
     end
   end
 
@@ -176,24 +160,43 @@ class CodeReviewsController < ApplicationController
   end
 
   def code_review_params
-    processed_params = params.require(:code_review).permit(
+    params.require(:code_review).permit(
       :repository_url,
       :candidate_name,
       :reviewer_name,
       :non_working_solution,
-      :overall_comments
-    ).to_h
+      :overall_comments,
+      clarity_scores: [
+        method_simplicity: [:score, :feedback],
+        naming_conventions: [:score, :feedback],
+        code_organization: [:score, :feedback],
+        comments_quality: [:score, :feedback]
+      ],
+      architecture_scores: [
+        separation_of_concerns: [:score, :feedback],
+        file_organization: [:score, :feedback],
+        dependency_management: [:score, :feedback],
+        framework_usage: [:score, :feedback]
+      ],
+      practices_scores: [
+        commit_quality: [:score, :feedback],
+        basic_testing: [:score, :feedback],
+        documentation: [:score, :feedback]
+      ],
+      problem_solving_scores: [
+        solution_simplicity: [:score, :feedback],
+        code_reuse: [:score, :feedback]
+      ],
+      bonus_scores: [
+        advanced_testing: [:score, :feedback],
+        security_practices: [:score, :feedback],
+        performance_considerations: [:score, :feedback]
+      ]
+    )
+  end
 
-    # Handle score parameters with explicit permission lists
-    VALID_SCORE_TYPES.each do |type|
-      if params[:code_review][type].present?
-        processed_params[type] = params[:code_review][type].permit(
-          *self.class.const_get("PERMITTED_#{type.upcase}_KEYS")
-        ).to_h
-      end
-    end
-
-    processed_params
+  def set_code_review
+    @code_review = CodeReview.find(params[:id])
   end
 
   # Define valid score types and fields

@@ -37,305 +37,363 @@
           <%= f.label :reviewer_name, "Reviewer Name", class: "form-label" %>
           <%= f.text_field :reviewer_name, class: "form-control" %>
         </div>
+
+        <div class="row mb-3">
+          <div class="col-md-3"><strong>Total Score:</strong></div>
+          <div class="col-md-9"><%= @code_review.total_score %> / 115</div>
+        </div>
       </div>
     </div>
 
-    <!-- Code Quality -->
+    <!-- Code Clarity -->
     <div class="card mb-4">
       <div class="card-header">
-        <h2>Code Quality and Style (<%= @code_review.calculate_quality_score %> / 35)</h2>
+        <h2>Code Clarity (<%= @code_review.clarity_scores["total_score"] %> / 35)</h2>
       </div>
       <div class="card-body">
-        <div class="ms-4 mb-3">
-          <div class="row mb-3">
-            <div class="col-md-3">Code Clarity (max 15):</div>
-            <div class="col-md-2">
-              <%= f.number_field "quality_scores[code_clarity]", 
-                  class: "form-control", 
-                  min: 0, 
-                  max: 15,
-                  value: @code_review.quality_scores["code_clarity"] %>
-            </div>
-            <div class="col-md-7">
-              <%= f.text_area "quality_scores[code_clarity_reason]", 
-                  class: "form-control", 
-                  placeholder: "Reason for score...",
-                  value: @code_review.quality_scores["code_clarity_reason"] %>
-            </div>
+        <div class="row align-items-center mb-2">
+          <div class="col-md-3">Method Simplicity:</div>
+          <div class="col-md-2">
+            <%= f.number_field "clarity_scores[method_simplicity][score]", 
+                class: "form-control", 
+                min: 0, 
+                max: 10,
+                value: @code_review.clarity_scores.dig("method_simplicity", "score") %>
           </div>
-
-          <div class="row mb-3">
-            <div class="col-md-3">Naming Conventions (max 10):</div>
-            <div class="col-md-2">
-              <%= f.number_field "quality_scores[naming_conventions]", 
-                  class: "form-control", 
-                  min: 0, 
-                  max: 10,
-                  value: @code_review.quality_scores["naming_conventions"] %>
-            </div>
-            <div class="col-md-7">
-              <%= f.text_area "quality_scores[naming_conventions_reason]", 
-                  class: "form-control", 
-                  placeholder: "Reason for score...",
-                  value: @code_review.quality_scores["naming_conventions_reason"] %>
-            </div>
-          </div>
-
-          <div class="row mb-3">
-            <div class="col-md-3">Code Organization (max 10):</div>
-            <div class="col-md-2">
-              <%= f.number_field "quality_scores[code_organization]", 
-                  class: "form-control", 
-                  min: 0, 
-                  max: 10,
-                  value: @code_review.quality_scores["code_organization"] %>
-            </div>
-            <div class="col-md-7">
-              <%= f.text_area "quality_scores[code_organization_reason]", 
-                  class: "form-control", 
-                  placeholder: "Reason for score...",
-                  value: @code_review.quality_scores["code_organization_reason"] %>
-            </div>
-          </div>
+          <div class="col-md-2 text-muted">(max: 10)</div>
         </div>
+
+        <div class="px-4">
+          <%= f.text_area "clarity_scores[method_simplicity][feedback]", 
+              class: "form-control mb-4 w-100",
+              placeholder: "Enter feedback for Method Simplicity...",
+              rows: 3,
+              value: @code_review.clarity_scores.dig("method_simplicity", "feedback") %>
+        </div>
+
+        <hr class="my-4">
+        
+        <div class="row align-items-center mb-2">
+          <div class="col-md-3">Naming Conventions:</div>
+          <div class="col-md-2">
+            <%= f.number_field "clarity_scores[naming_conventions][score]", 
+                class: "form-control", 
+                min: 0, 
+                max: 10,
+                value: @code_review.clarity_scores.dig("naming_conventions", "score") %>
+          </div>
+          <div class="col-md-2 text-muted">(max: 10)</div>
+        </div>
+
+        <%= f.text_area "clarity_scores[naming_conventions][feedback]", 
+            class: "form-control form-control-lg mb-4",
+            placeholder: "Enter feedback for Naming Conventions...",
+            rows: 3,
+            value: @code_review.clarity_scores.dig("naming_conventions", "feedback") %>
+
+        <hr class="my-4">
+        
+        <div class="row align-items-center mb-2">
+          <div class="col-md-3">Code Organization:</div>
+          <div class="col-md-2">
+            <%= f.number_field "clarity_scores[code_organization][score]", 
+                class: "form-control", 
+                min: 0, 
+                max: 10,
+                value: @code_review.clarity_scores.dig("code_organization", "score") %>
+          </div>
+          <div class="col-md-2 text-muted">(max: 10)</div>
+        </div>
+
+        <%= f.text_area "clarity_scores[code_organization][feedback]", 
+            class: "form-control form-control-lg mb-4",
+            placeholder: "Enter feedback for Code Organization...",
+            rows: 3,
+            value: @code_review.clarity_scores.dig("code_organization", "feedback") %>
+
+        <hr class="my-4">
+        
+        <div class="row align-items-center mb-2">
+          <div class="col-md-3">Comments Quality:</div>
+          <div class="col-md-2">
+            <%= f.number_field "clarity_scores[comments_quality][score]", 
+                class: "form-control", 
+                min: 0, 
+                max: 5,
+                value: @code_review.clarity_scores.dig("comments_quality", "score") %>
+          </div>
+          <div class="col-md-2 text-muted">(max: 5)</div>
+        </div>
+
+        <%= f.text_area "clarity_scores[comments_quality][feedback]", 
+            class: "form-control form-control-lg mb-4",
+            placeholder: "Enter feedback for Comments Quality...",
+            rows: 3,
+            value: @code_review.clarity_scores.dig("comments_quality", "feedback") %>
+      </div>
+    </div>
+
+    <!-- Architecture -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h2>Architecture (<%= @code_review.architecture_scores["total_score"] %> / 25)</h2>
+      </div>
+      <div class="card-body">
+        <div class="row align-items-center mb-2">
+          <div class="col-md-3">Separation of Concerns:</div>
+          <div class="col-md-2">
+            <%= f.number_field "architecture_scores[separation_of_concerns][score]", 
+                class: "form-control", 
+                min: 0, 
+                max: 10,
+                value: @code_review.architecture_scores.dig("separation_of_concerns", "score") %>
+          </div>
+          <div class="col-md-2 text-muted">(max: 10)</div>
+        </div>
+
+        <%= f.text_area "architecture_scores[separation_of_concerns][feedback]", 
+            class: "form-control form-control-lg mb-4", 
+            placeholder: "Enter feedback for Separation of Concerns...",
+            rows: 3,
+            value: @code_review.architecture_scores.dig("separation_of_concerns", "feedback") %>
+
+        <hr class="my-4">
+        
+        <div class="row align-items-center mb-2">
+          <div class="col-md-3">File Organization:</div>
+          <div class="col-md-2">
+            <%= f.number_field "architecture_scores[file_organization][score]", 
+                class: "form-control", 
+                min: 0, 
+                max: 5,
+                value: @code_review.architecture_scores.dig("file_organization", "score") %>
+          </div>
+          <div class="col-md-2 text-muted">(max: 5)</div>
+        </div>
+
+        <%= f.text_area "architecture_scores[file_organization][feedback]", 
+            class: "form-control form-control-lg mb-4", 
+            placeholder: "Enter feedback for File Organization...",
+            rows: 3,
+            value: @code_review.architecture_scores.dig("file_organization", "feedback") %>
+
+        <hr class="my-4">
+        
+        <div class="row align-items-center mb-2">
+          <div class="col-md-3">Dependency Management:</div>
+          <div class="col-md-2">
+            <%= f.number_field "architecture_scores[dependency_management][score]", 
+                class: "form-control", 
+                min: 0, 
+                max: 5,
+                value: @code_review.architecture_scores.dig("dependency_management", "score") %>
+          </div>
+          <div class="col-md-2 text-muted">(max: 5)</div>
+        </div>
+
+        <%= f.text_area "architecture_scores[dependency_management][feedback]", 
+            class: "form-control form-control-lg mb-4", 
+            placeholder: "Enter feedback for Dependency Management...",
+            rows: 3,
+            value: @code_review.architecture_scores.dig("dependency_management", "feedback") %>
+
+        <hr class="my-4">
+        
+        <div class="row align-items-center mb-2">
+          <div class="col-md-3">Framework Usage:</div>
+          <div class="col-md-2">
+            <%= f.number_field "architecture_scores[framework_usage][score]", 
+                class: "form-control", 
+                min: 0, 
+                max: 5,
+                value: @code_review.architecture_scores.dig("framework_usage", "score") %>
+          </div>
+          <div class="col-md-2 text-muted">(max: 5)</div>
+        </div>
+
+        <%= f.text_area "architecture_scores[framework_usage][feedback]", 
+            class: "form-control form-control-lg mb-4", 
+            placeholder: "Enter feedback for Framework Usage...",
+            rows: 3,
+            value: @code_review.architecture_scores.dig("framework_usage", "feedback") %>
       </div>
     </div>
 
     <!-- Documentation -->
     <div class="card mb-4">
       <div class="card-header">
-        <h2>Documentation (<%= @code_review.calculate_documentation_score %> / 20)</h2>
+        <h2>Documentation (<%= @code_review.practices_scores["total_score"] %> / 25)</h2>
       </div>
       <div class="card-body">
-        <div class="ms-4 mb-3">
-          <div class="row mb-3">
-            <div class="col-md-2">Setup Instructions (max 8):</div>
-            <div class="col-md-2">
-              <%= f.number_field "documentation_scores[setup_instructions]", 
-                  class: "form-control", 
-                  min: 0, 
-                  max: 8,
-                  value: @code_review.documentation_scores["setup_instructions"] %>
-            </div>
-            <div class="col-md-2">Reason:</div>
-            <div class="col-md-6">
-              <%= f.text_area "documentation_scores[setup_instructions_reason]", 
-                  class: "form-control", 
-                  placeholder: "Reason for score...",
-                  value: @code_review.documentation_scores["setup_instructions_reason"] %>
-            </div>
+        <div class="row align-items-center mb-2">
+          <div class="col-md-3">Commit Quality:</div>
+          <div class="col-md-2">
+            <%= f.number_field "practices_scores[commit_quality][score]", 
+                class: "form-control", 
+                min: 0, 
+                max: 10,
+                value: @code_review.practices_scores.dig("commit_quality", "score") %>
           </div>
-
-          <div class="row mb-3">
-            <div class="col-md-2">Technical Decisions (max 7):</div>
-            <div class="col-md-2">
-              <%= f.number_field "documentation_scores[technical_decisions]", 
-                  class: "form-control", 
-                  min: 0, 
-                  max: 7,
-                  value: @code_review.documentation_scores["technical_decisions"] %>
-            </div>
-            <div class="col-md-2">Reason:</div>
-            <div class="col-md-6">
-              <%= f.text_area "documentation_scores[technical_decisions_reason]", 
-                  class: "form-control", 
-                  placeholder: "Reason for score...",
-                  value: @code_review.documentation_scores["technical_decisions_reason"] %>
-            </div>
-          </div>
-
-          <div class="row mb-3">
-            <div class="col-md-2">Assumptions (max 5):</div>
-            <div class="col-md-2">
-              <%= f.number_field "documentation_scores[assumptions]", 
-                  class: "form-control", 
-                  min: 0, 
-                  max: 5,
-                  value: @code_review.documentation_scores["assumptions"] %>
-            </div>
-            <div class="col-md-2">Reason:</div>
-            <div class="col-md-6">
-              <%= f.text_area "documentation_scores[assumptions_reason]", 
-                  class: "form-control", 
-                  placeholder: "Reason for score...",
-                  value: @code_review.documentation_scores["assumptions_reason"] %>
-            </div>
-          </div>
+          <div class="col-md-2 text-muted">(max: 10)</div>
         </div>
-      </div>
-    </div>
 
-    <!-- Technical Implementation -->
-    <div class="card mb-4">
-      <div class="card-header">
-        <h2>Technical Implementation (<%= @code_review.calculate_technical_score %> / 25)</h2>
-      </div>
-      <div class="card-body">
-        <div class="ms-4 mb-3">
-          <div class="row mb-3">
-            <div class="col-md-2">Solution Correctness (max 15):</div>
-            <div class="col-md-2">
-              <%= f.number_field "technical_scores[solution_correctness]", 
-                  class: "form-control", 
-                  min: 0, 
-                  max: 15,
-                  value: @code_review.technical_scores["solution_correctness"] %>
-            </div>
-            <div class="col-md-2">Reason:</div>
-            <div class="col-md-6">
-              <%= f.text_area "technical_scores[solution_correctness_reason]", 
-                  class: "form-control", 
-                  placeholder: "Reason for score...",
-                  value: @code_review.technical_scores["solution_correctness_reason"] %>
-            </div>
-          </div>
+        <%= f.text_area "practices_scores[commit_quality][feedback]", 
+            class: "form-control form-control-lg mb-4", 
+            placeholder: "Enter feedback for Commit Quality...",
+            rows: 3,
+            value: @code_review.practices_scores.dig("commit_quality", "feedback") %>
 
-          <div class="row mb-3">
-            <div class="col-md-2">Error Handling (max 5):</div>
-            <div class="col-md-2">
-              <%= f.number_field "technical_scores[error_handling]", 
-                  class: "form-control", 
-                  min: 0, 
-                  max: 5,
-                  value: @code_review.technical_scores["error_handling"] %>
-            </div>
-            <div class="col-md-2">Reason:</div>
-            <div class="col-md-6">
-              <%= f.text_area "technical_scores[error_handling_reason]", 
-                  class: "form-control", 
-                  placeholder: "Reason for score...",
-                  value: @code_review.technical_scores["error_handling_reason"] %>
-            </div>
+        <hr class="my-4">
+        
+        <div class="row align-items-center mb-2">
+          <div class="col-md-3">Basic Testing:</div>
+          <div class="col-md-2">
+            <%= f.number_field "practices_scores[basic_testing][score]", 
+                class: "form-control", 
+                min: 0, 
+                max: 10,
+                value: @code_review.practices_scores.dig("basic_testing", "score") %>
           </div>
-
-          <div class="row mb-3">
-            <div class="col-md-2">Language Usage (max 5):</div>
-            <div class="col-md-2">
-              <%= f.number_field "technical_scores[language_usage]", 
-                  class: "form-control", 
-                  min: 0, 
-                  max: 5,
-                  value: @code_review.technical_scores["language_usage"] %>
-            </div>
-            <div class="col-md-2">Reason:</div>
-            <div class="col-md-6">
-              <%= f.text_area "technical_scores[language_usage_reason]", 
-                  class: "form-control", 
-                  placeholder: "Reason for score...",
-                  value: @code_review.technical_scores["language_usage_reason"] %>
-            </div>
-          </div>
+          <div class="col-md-2 text-muted">(max: 10)</div>
         </div>
+
+        <%= f.text_area "practices_scores[basic_testing][feedback]", 
+            class: "form-control form-control-lg mb-4", 
+            placeholder: "Enter feedback for Basic Testing...",
+            rows: 3,
+            value: @code_review.practices_scores.dig("basic_testing", "feedback") %>
+
+        <hr class="my-4">
+        
+        <div class="row align-items-center mb-2">
+          <div class="col-md-3">Documentation:</div>
+          <div class="col-md-2">
+            <%= f.number_field "practices_scores[documentation][score]", 
+                class: "form-control", 
+                min: 0, 
+                max: 5,
+                value: @code_review.practices_scores.dig("documentation", "score") %>
+          </div>
+          <div class="col-md-2 text-muted">(max: 5)</div>
+        </div>
+
+        <%= f.text_area "practices_scores[documentation][feedback]", 
+            class: "form-control form-control-lg mb-4", 
+            placeholder: "Enter feedback for Documentation...",
+            rows: 3,
+            value: @code_review.practices_scores.dig("documentation", "feedback") %>
       </div>
     </div>
 
     <!-- Problem Solving -->
     <div class="card mb-4">
       <div class="card-header">
-        <h2>Problem Solving (<%= @code_review.calculate_problem_solving_score %> / 20)</h2>
+        <h2>Problem Solving (<%= @code_review.problem_solving_scores["total_score"] %> / 15)</h2>
       </div>
       <div class="card-body">
-        <div class="ms-4 mb-3">
-          <div class="row mb-3">
-            <div class="col-md-2">Completeness (max 10):</div>
-            <div class="col-md-2">
-              <%= f.number_field "problem_solving_scores[completeness]", 
-                  class: "form-control", 
-                  min: 0, 
-                  max: 10,
-                  value: @code_review.problem_solving_scores["completeness"] %>
-            </div>
-            <div class="col-md-2">Reason:</div>
-            <div class="col-md-6">
-              <%= f.text_area "problem_solving_scores[completeness_reason]", 
-                  class: "form-control", 
-                  placeholder: "Reason for score...",
-                  value: @code_review.problem_solving_scores["completeness_reason"] %>
-            </div>
+        <div class="row align-items-center mb-2">
+          <div class="col-md-3">Solution Simplicity:</div>
+          <div class="col-md-2">
+            <%= f.number_field "problem_solving_scores[solution_simplicity][score]", 
+                class: "form-control", 
+                min: 0, 
+                max: 10,
+                value: @code_review.problem_solving_scores.dig("solution_simplicity", "score") %>
           </div>
-
-          <div class="row mb-3">
-            <div class="col-md-2">Approach (max 10):</div>
-            <div class="col-md-2">
-              <%= f.number_field "problem_solving_scores[approach]", 
-                  class: "form-control", 
-                  min: 0, 
-                  max: 10,
-                  value: @code_review.problem_solving_scores["approach"] %>
-            </div>
-            <div class="col-md-2">Reason:</div>
-            <div class="col-md-6">
-              <%= f.text_area "problem_solving_scores[approach_reason]", 
-                  class: "form-control", 
-                  placeholder: "Reason for score...",
-                  value: @code_review.problem_solving_scores["approach_reason"] %>
-            </div>
-          </div>
+          <div class="col-md-2 text-muted">(max: 10)</div>
         </div>
+
+        <%= f.text_area "problem_solving_scores[solution_simplicity][feedback]", 
+            class: "form-control form-control-lg mb-4", 
+            placeholder: "Enter feedback for Solution Simplicity...",
+            rows: 3,
+            value: @code_review.problem_solving_scores.dig("solution_simplicity", "feedback") %>
+
+        <hr class="my-4">
+        
+        <div class="row align-items-center mb-2">
+          <div class="col-md-3">Code Reuse:</div>
+          <div class="col-md-2">
+            <%= f.number_field "problem_solving_scores[code_reuse][score]", 
+                class: "form-control", 
+                min: 0, 
+                max: 5,
+                value: @code_review.problem_solving_scores.dig("code_reuse", "score") %>
+          </div>
+          <div class="col-md-2 text-muted">(max: 5)</div>
+        </div>
+
+        <%= f.text_area "problem_solving_scores[code_reuse][feedback]", 
+            class: "form-control form-control-lg mb-4", 
+            placeholder: "Enter feedback for Code Reuse...",
+            rows: 3,
+            value: @code_review.problem_solving_scores.dig("code_reuse", "feedback") %>
       </div>
     </div>
 
-    <!-- Testing Bonus -->
+    <!-- Bonus Points -->
     <div class="card mb-4">
       <div class="card-header">
-        <h2>Testing Bonus (<%= @code_review.calculate_testing_bonus %> / 15)</h2>
+        <h2>Bonus Points (<%= @code_review.bonus_scores["total_score"] %> / 15)</h2>
       </div>
       <div class="card-body">
-        <div class="ms-4 mb-3">
-          <div class="row mb-3">
-            <div class="col-md-2">Coverage (max 7):</div>
-            <div class="col-md-2">
-              <%= f.number_field "testing_scores[coverage]", 
-                  class: "form-control", 
-                  min: 0, 
-                  max: 7,
-                  value: @code_review.testing_scores["coverage"] %>
-            </div>
-            <div class="col-md-2">Reason:</div>
-            <div class="col-md-6">
-              <%= f.text_area "testing_scores[coverage_reason]", 
-                  class: "form-control", 
-                  placeholder: "Reason for score...",
-                  value: @code_review.testing_scores["coverage_reason"] %>
-            </div>
+        <div class="row align-items-center mb-2">
+          <div class="col-md-3">Advanced Testing:</div>
+          <div class="col-md-2">
+            <%= f.number_field "bonus_scores[advanced_testing][score]", 
+                class: "form-control", 
+                min: 0, 
+                max: 5,
+                value: @code_review.bonus_scores.dig("advanced_testing", "score") %>
           </div>
-
-          <div class="row mb-3">
-            <div class="col-md-2">Quality (max 5):</div>
-            <div class="col-md-2">
-              <%= f.number_field "testing_scores[quality]", 
-                  class: "form-control", 
-                  min: 0, 
-                  max: 5,
-                  value: @code_review.testing_scores["quality"] %>
-            </div>
-            <div class="col-md-2">Reason:</div>
-            <div class="col-md-6">
-              <%= f.text_area "testing_scores[quality_reason]", 
-                  class: "form-control", 
-                  placeholder: "Reason for score...",
-                  value: @code_review.testing_scores["quality_reason"] %>
-            </div>
-          </div>
-
-          <div class="row mb-3">
-            <div class="col-md-2">Edge Cases (max 3):</div>
-            <div class="col-md-2">
-              <%= f.number_field "testing_scores[edge_cases]", 
-                  class: "form-control", 
-                  min: 0, 
-                  max: 3,
-                  value: @code_review.testing_scores["edge_cases"] %>
-            </div>
-            <div class="col-md-2">Reason:</div>
-            <div class="col-md-6">
-              <%= f.text_area "testing_scores[edge_cases_reason]", 
-                  class: "form-control", 
-                  placeholder: "Reason for score...",
-                  value: @code_review.testing_scores["edge_cases_reason"] %>
-            </div>
-          </div>
+          <div class="col-md-2 text-muted">(max: 5)</div>
         </div>
+
+        <%= f.text_area "bonus_scores[advanced_testing][feedback]", 
+            class: "form-control form-control-lg mb-4", 
+            placeholder: "Enter feedback for Advanced Testing...",
+            rows: 3,
+            value: @code_review.bonus_scores.dig("advanced_testing", "feedback") %>
+
+        <hr class="my-4">
+        
+        <div class="row align-items-center mb-2">
+          <div class="col-md-3">Security Practices:</div>
+          <div class="col-md-2">
+            <%= f.number_field "bonus_scores[security_practices][score]", 
+                class: "form-control", 
+                min: 0, 
+                max: 5,
+                value: @code_review.bonus_scores.dig("security_practices", "score") %>
+          </div>
+          <div class="col-md-2 text-muted">(max: 5)</div>
+        </div>
+
+        <%= f.text_area "bonus_scores[security_practices][feedback]", 
+            class: "form-control form-control-lg mb-4", 
+            placeholder: "Enter feedback for Security Practices...",
+            rows: 3,
+            value: @code_review.bonus_scores.dig("security_practices", "feedback") %>
+
+        <hr class="my-4">
+        
+        <div class="row align-items-center mb-2">
+          <div class="col-md-3">Performance:</div>
+          <div class="col-md-2">
+            <%= f.number_field "bonus_scores[performance_considerations][score]", 
+                class: "form-control", 
+                min: 0, 
+                max: 5,
+                value: @code_review.bonus_scores.dig("performance_considerations", "score") %>
+          </div>
+          <div class="col-md-2 text-muted">(max: 5)</div>
+        </div>
+
+        <%= f.text_area "bonus_scores[performance_considerations][feedback]", 
+            class: "form-control form-control-lg mb-4", 
+            placeholder: "Enter feedback for Performance Considerations...",
+            rows: 3,
+            value: @code_review.bonus_scores.dig("performance_considerations", "feedback") %>
       </div>
     </div>
 

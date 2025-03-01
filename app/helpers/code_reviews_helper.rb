@@ -13,4 +13,8 @@ module CodeReviewsHelper
       'bg-secondary text-white'
     end
   end
+
+  def format_score(score, total = 115)
+    "#{score.to_f.round(1)} / #{total}"
+  end
 end 
