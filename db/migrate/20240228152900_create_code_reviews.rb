@@ -1,4 +1,4 @@
-class CreateCodeReviews < ActiveRecord::Migration[7.0]
+class CreateCodeReviews < ActiveRecord::Migration[7.1]
   def change
     create_table :code_reviews do |t|
       t.string :repository_url, null: false
@@ -14,6 +14,11 @@ class CreateCodeReviews < ActiveRecord::Migration[7.0]
       t.text :overall_comments
       t.text :error_message
       t.integer :status, default: 0, null: false
+      t.jsonb :clarity_scores, default: {}
+      t.jsonb :architecture_scores, default: {}
+      t.jsonb :practices_scores, default: {}
+      t.jsonb :bonus_scores, default: {}
+      t.decimal :total_score
       
       t.timestamps
     end

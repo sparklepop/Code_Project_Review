@@ -14,31 +14,31 @@ class CodeReview < ApplicationRecord
     :method_simplicity,
     :code_organization,
     :comments_quality,
-    :total_score
+    :category_total
 
   store_accessor :architecture_scores,
     :separation_of_concerns,
     :file_organization,
     :dependency_management,
     :framework_usage,
-    :total_score
+    :category_total
 
   store_accessor :practices_scores,
     :commit_quality,
     :basic_testing,
     :documentation,
-    :total_score
+    :category_total
 
   store_accessor :problem_solving_scores,
     :solution_simplicity,
     :code_reuse,
-    :total_score
+    :category_total
 
   store_accessor :bonus_scores,
     :advanced_testing,
     :security_practices,
     :performance_considerations,
-    :total_score
+    :category_total
 
   # Initialize and convert scores before save
   before_validation :process_scores
@@ -78,9 +78,17 @@ class CodeReview < ApplicationRecord
       end
       
       final_total = total.values.sum
-      Rails.logger.debug "Final Total: #{final_total}"
+      Rails.logger.debug "\n=== Final Total Before Save ==="
+      Rails.logger.debug "final_total: #{final_total.inspect}"
       
-      update!(
+      # Store category totals in their respective score hashes
+      results[:clarity_scores][:total_score] = total[:clarity]
+      results[:architecture_scores][:total_score] = total[:architecture]
+      results[:practices_scores][:total_score] = total[:practices]
+      results[:problem_solving_scores][:total_score] = total[:problem_solving]
+      results[:bonus_scores][:total_score] = total[:bonus]
+      
+      result = update!(
         status: :completed,
         clarity_scores: results[:clarity_scores],
         architecture_scores: results[:architecture_scores],
@@ -90,6 +98,9 @@ class CodeReview < ApplicationRecord
         total_score: final_total,
         assessment_level: calculate_assessment_level(final_total)
       )
+      Rails.logger.debug "\n=== After Save ==="
+      Rails.logger.debug "Update result: #{result.inspect}"
+      Rails.logger.debug "Stored total_score: #{reload.total_score.inspect}"
     rescue => e
       Rails.logger.error "\n=== Error in Analysis ==="
       Rails.logger.error e.message
@@ -98,6 +109,11 @@ class CodeReview < ApplicationRecord
     ensure
       github_service&.cleanup
     end
+  end
+
+  def total_score
+    # Use the actual total_score column
+    self[:total_score].to_f - (non_working_solution? ? 30 : 0)
   end
 
   private
