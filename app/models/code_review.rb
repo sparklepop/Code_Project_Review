@@ -16,6 +16,33 @@ class CodeReview < ApplicationRecord
   store_accessor :problem_solving_scores, :completeness, :approach
   store_accessor :testing_scores, :coverage, :quality, :edge_cases
 
+  # Store accessors for score components
+  store_accessor :clarity_scores,
+    :naming_conventions,
+    :method_simplicity,
+    :code_organization,
+    :comments_quality
+
+  store_accessor :architecture_scores,
+    :separation_of_concerns,
+    :file_organization,
+    :dependency_management,
+    :framework_usage
+
+  store_accessor :practices_scores,
+    :commit_quality,
+    :basic_testing,
+    :documentation
+
+  store_accessor :problem_solving_scores,
+    :solution_simplicity,
+    :code_reuse
+
+  store_accessor :bonus_scores,
+    :advanced_testing,
+    :security_practices,
+    :performance_considerations
+
   # Initialize and convert scores before save
   before_validation :process_scores
 
@@ -55,17 +82,13 @@ class CodeReview < ApplicationRecord
   end
 
   def calculate_total_score
-    base_score = [
-      calculate_quality_score,
-      calculate_documentation_score,
-      calculate_technical_score,
-      calculate_problem_solving_score
+    [
+      calculate_clarity_score,
+      calculate_architecture_score,
+      calculate_practices_score,
+      calculate_problem_solving_score,
+      calculate_bonus_score
     ].sum
-
-    bonus = calculate_testing_bonus
-    deduction = non_working_solution? ? 30 : 0
-
-    base_score + bonus - deduction
   end
 
   def assessment_level
@@ -142,6 +165,22 @@ class CodeReview < ApplicationRecord
   end
 
   def score_attributes
-    %w[quality_scores documentation_scores technical_scores problem_solving_scores testing_scores]
+    %w[clarity_scores architecture_scores practices_scores problem_solving_scores bonus_scores]
+  end
+
+  def calculate_clarity_score
+    clarity_scores.values.map(&:to_f).sum
+  end
+
+  def calculate_architecture_score
+    architecture_scores.values.map(&:to_f).sum
+  end
+
+  def calculate_practices_score
+    practices_scores.values.map(&:to_f).sum
+  end
+
+  def calculate_bonus_score
+    bonus_scores.values.map(&:to_f).sum
   end
 end 

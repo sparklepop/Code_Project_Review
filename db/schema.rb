@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_03_01_023000) do
+ActiveRecord::Schema[8.0].define(version: 2024_03_01_030000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -18,17 +18,19 @@ ActiveRecord::Schema[8.0].define(version: 2024_03_01_023000) do
     t.string "repository_url", null: false
     t.string "candidate_name", null: false
     t.string "reviewer_name", null: false
-    t.jsonb "quality_scores", default: {}, null: false
-    t.jsonb "documentation_scores", default: {}, null: false
-    t.jsonb "technical_scores", default: {}, null: false
     t.jsonb "problem_solving_scores", default: {}, null: false
-    t.jsonb "testing_scores", default: {}, null: false
     t.boolean "non_working_solution", default: false
     t.text "overall_comments"
     t.text "error_message"
     t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "clarity_scores", default: {}, null: false
+    t.jsonb "architecture_scores", default: {}, null: false
+    t.jsonb "practices_scores", default: {}, null: false
+    t.jsonb "bonus_scores", default: {}, null: false
+    t.decimal "total_score", precision: 5, scale: 2
+    t.string "assessment_level"
     t.index ["repository_url"], name: "index_code_reviews_on_repository_url"
     t.index ["status"], name: "index_code_reviews_on_status"
   end

@@ -1,188 +1,256 @@
 module Ai
   class CodeReviewer
-    def initialize(submission_url)
-      @submission_url = submission_url
-      # For now, just log that we would fetch content
-      Rails.logger.debug "Would fetch repository content from: #{submission_url}"
-      @repo_content = {} # Placeholder until we implement GitHub API integration
+    SCORE_WEIGHTS = {
+      code_clarity: 35,
+      architecture: 25,
+      practices: 25,
+      problem_solving: 15,
+      bonus: 15
+    }.freeze
+
+    CLARITY_WEIGHTS = {
+      naming_conventions: 10,
+      method_simplicity: 10,
+      code_organization: 10,
+      comments_quality: 5
+    }.freeze
+
+    ARCHITECTURE_WEIGHTS = {
+      separation_of_concerns: 10,
+      file_organization: 5,
+      dependency_management: 5,
+      framework_usage: 5
+    }.freeze
+
+    PRACTICES_WEIGHTS = {
+      commit_quality: 10,
+      basic_testing: 10,
+      documentation: 5
+    }.freeze
+
+    PROBLEM_SOLVING_WEIGHTS = {
+      solution_simplicity: 10,
+      code_reuse: 5
+    }.freeze
+
+    BONUS_WEIGHTS = {
+      advanced_testing: 5,
+      security_practices: 5,
+      performance_considerations: 5
+    }.freeze
+
+    def initialize(repo_path)
+      @repo_path = repo_path
+      @files = load_repository_files
+      Rails.logger.debug "Loaded #{@files.count} files for analysis"
     end
 
     def analyze
       Rails.logger.debug "Starting code analysis..."
       
-      # This would be replaced with actual AI analysis
+      # Group files by type for analysis
+      ruby_files = @files.select { |path, _| path.end_with?('.rb') }
+      js_files = @files.select { |path, _| path.end_with?('.js', '.ts') }
+      test_files = @files.select { |path, _| path.include?('test/') || path.include?('spec/') }
+      doc_files = @files.select { |path, _| path.end_with?('.md', '.rdoc') }
+      
       results = {
-        quality_scores: analyze_code_quality,
-        documentation_scores: analyze_documentation,
-        technical_scores: analyze_technical_implementation,
-        problem_solving_scores: analyze_problem_solving,
-        testing_scores: analyze_testing,
-        overall_comments: generate_overall_comments
+        clarity_scores: analyze_code_clarity(ruby_files, js_files),
+        architecture_scores: analyze_architecture(ruby_files, js_files),
+        practices_scores: analyze_development_practices(test_files, doc_files),
+        problem_solving_scores: analyze_problem_solving(ruby_files, js_files),
+        bonus_scores: analyze_bonus_points(ruby_files, js_files, test_files)
       }
 
-      Rails.logger.debug "Analysis results: #{results.inspect}"
+      Rails.logger.debug "Analysis complete: #{results.inspect}"
       results
     end
 
     private
 
-    def fetch_repository_content
-      # TODO: Implement GitHub API integration
-      # For now, return empty hash to prevent errors
+    def load_repository_files
+      files = {}
+      Dir.glob("#{@repo_path}/**/*").each do |file|
+        next unless File.file?(file)
+        next if file.include?('.git/')
+        
+        relative_path = file.sub("#{@repo_path}/", '')
+        files[relative_path] = File.read(file)
+      end
+      
+      Rails.logger.debug "Loaded #{files.count} files for analysis"
+      files
+    rescue => e
+      Rails.logger.error "Error loading repository files: #{e.message}"
       {}
     end
 
-    def analyze_code_quality
-      # This would actually analyze the code and provide real reasoning
+    def analyze_code_clarity(ruby_files, js_files)
+      # Analyze naming conventions (10 points)
+      naming_results = analyze_naming_conventions(ruby_files, js_files)
+      
+      # Analyze method simplicity (10 points)
+      simplicity_results = analyze_method_simplicity(ruby_files, js_files)
+      
+      # Analyze code organization (10 points)
+      organization_results = analyze_code_organization(ruby_files, js_files)
+      
+      # Analyze comments quality (5 points)
+      comments_results = analyze_comments_quality(ruby_files, js_files)
+
       {
-        code_clarity: analyze_code_clarity,
-        code_clarity_reason: provide_clarity_reasoning,
-        naming_conventions: analyze_naming_conventions,
-        naming_conventions_reason: provide_naming_reasoning,
-        code_organization: analyze_code_organization,
-        code_organization_reason: provide_organization_reasoning
+        naming_conventions: naming_results,
+        method_simplicity: simplicity_results,
+        code_organization: organization_results,
+        comments_quality: comments_results,
+        total_score: calculate_category_score([
+          naming_results,
+          simplicity_results,
+          organization_results,
+          comments_results
+        ])
       }
     end
 
-    def analyze_code_clarity
-      # Example of what the real implementation would do:
-      # - Check method lengths
-      # - Analyze method complexity
-      # - Check for clear method names
-      # - Look for single responsibility principle
-      score = calculate_clarity_score
-      @clarity_reasons = generate_clarity_reasons  # Store reasons for later
-      score
+    def analyze_architecture(ruby_files, js_files)
+      # Analyze separation of concerns (10 points)
+      concerns_results = analyze_separation_of_concerns(ruby_files, js_files)
+      
+      # Analyze file organization (5 points)
+      organization_results = analyze_file_organization(ruby_files, js_files)
+      
+      # Analyze dependency management (5 points)
+      dependency_results = analyze_dependencies
+      
+      # Analyze framework usage (5 points)
+      framework_results = analyze_framework_usage(ruby_files, js_files)
+
+      {
+        separation_of_concerns: concerns_results,
+        file_organization: organization_results,
+        dependency_management: dependency_results,
+        framework_usage: framework_results,
+        total_score: calculate_category_score([
+          concerns_results,
+          organization_results,
+          dependency_results,
+          framework_results
+        ])
+      }
     end
 
-    def provide_clarity_reasoning
-      # Use the analysis results to provide specific examples
-      "Methods are well-named and follow single responsibility principle. " \
-      "For example, the `#{@clarity_reasons[:good_example]}` method clearly handles one task."
+    def analyze_naming_conventions(ruby_files, js_files)
+      issues = []
+      good_examples = []
+
+      files_to_analyze = ruby_files.merge(js_files)
+      files_to_analyze.each do |path, content|
+        analyze_file_naming(path, content, issues, good_examples)
+      end
+
+      score = calculate_naming_score(issues)
+      {
+        score: score,
+        feedback: generate_naming_feedback(issues, good_examples),
+        details: {
+          issues: issues,
+          good_examples: good_examples
+        }
+      }
     end
 
-    def analyze_naming_conventions
-      8 # Sample score out of 10
+    def analyze_file_naming(path, content, issues, good_examples)
+      # I can analyze the content and provide specific feedback
+      content.scan(/\b(def|class|module|var|let|const)\s+([a-zA-Z_]\w*)/).each do |type, name|
+        if good_name?(name, type)
+          good_examples << { type: type, name: name, file: path }
+        else
+          issues << { type: type, name: name, file: path, suggestion: suggest_better_name(name, type) }
+        end
+      end
     end
 
-    def provide_naming_reasoning
-      "Variables and methods follow Ruby conventions, though some model names could be more descriptive."
-    end
-
-    def analyze_code_organization
+    def analyze_code_organization(ruby_files, js_files)
       9 # Sample score out of 10
     end
 
-    def provide_organization_reasoning
-      "Code is logically organized into modules and classes with clear separation of concerns."
+    def analyze_method_simplicity(ruby_files, js_files)
+      # Implementation of analyze_method_simplicity method
+      # This method should return two values: simplicity_score and simplicity_feedback
+      8, "Method simplicity analysis feedback" # Placeholder values
     end
 
-    def analyze_setup_instructions
-      7 # Sample score out of 8
+    def analyze_comments_quality(ruby_files, js_files)
+      # Implementation of analyze_comments_quality method
+      # This method should return two values: comments_score and comments_feedback
+      7, "Comments quality analysis feedback" # Placeholder values
     end
 
-    def analyze_technical_decisions
-      6 # Sample score out of 7
+    def calculate_naming_score(issues)
+      # Implementation of calculate_naming_score method
+      # This method should return a score based on the number of issues
+      8 # Placeholder score
     end
 
-    def analyze_assumptions
-      4 # Sample score out of 5
+    def generate_naming_feedback(issues, good_examples)
+      # Implementation of generate_naming_feedback method
+      # This method should return a string of feedback based on the issues and good_examples
+      "Good naming practices found in the following files: #{good_examples.map { |e| e[:file] }.join(', ')}"
     end
 
-    def analyze_solution_correctness
-      13 # Sample score out of 15
+    def suggest_better_name(name, type)
+      # Implementation of suggest_better_name method
+      # This method should return a suggested better name for the given name and type
+      "Better_#{name}_#{type}" # Placeholder suggestion
     end
 
-    def analyze_error_handling
-      4 # Sample score out of 5
+    def good_name?(name, type)
+      # Implementation of good_name? method
+      # This method should return true if the name is considered good, false otherwise
+      true # Placeholder implementation
     end
 
-    def analyze_language_usage
-      4 # Sample score out of 5
-    end
-
-    def analyze_completeness
-      9 # Sample score out of 10
-    end
-
-    def analyze_approach
-      8 # Sample score out of 10
-    end
-
-    def analyze_test_coverage
-      6 # Sample score out of 7
-    end
-
-    def analyze_test_quality
-      4 # Sample score out of 5
-    end
-
-    def analyze_edge_cases
-      2 # Sample score out of 3
-    end
-
-    def generate_overall_comments
-      scores = {
-        quality_total: 29,
-        quality_comments: "Good naming conventions and organization, with clear code structure.",
-        documentation_total: 17,
-        documentation_comments: "Well-documented setup instructions and technical decisions.",
-        technical_total: 21,
-        technical_comments: "Strong solution correctness with adequate error handling.",
-        problem_solving_total: 17,
-        problem_solving_comments: "Complete solution with a solid approach.",
-        testing_total: 12,
-        testing_comments: "Good test coverage with some edge cases covered."
-      }
-
-      format_overall_comments(scores)
-    end
-
-    def format_overall_comments(scores)
-      comments = []
-      
-      comments << "Code Quality (#{scores[:quality_total]}/35): #{scores[:quality_comments]}"
-      comments << "Documentation (#{scores[:documentation_total]}/20): #{scores[:documentation_comments]}"
-      comments << "Technical Implementation (#{scores[:technical_total]}/25): #{scores[:technical_comments]}"
-      comments << "Problem Solving (#{scores[:problem_solving_total]}/20): #{scores[:problem_solving_comments]}"
-      comments << "Testing Bonus (#{scores[:testing_total]}/15): #{scores[:testing_comments]}"
-      
-      comments.join("\n\n")
-    end
-
-    def calculate_clarity_score
-      # TODO: Implement actual analysis
-      12 # Placeholder score
-    end
-
-    def generate_clarity_reasons
-      # TODO: Implement actual analysis
-      { good_example: 'process_order' } # Placeholder example
-    end
-
-    def analyze_documentation
+    def analyze_separation_of_concerns(ruby_files, js_files)
+      # Implementation of analyze_separation_of_concerns method
+      # This method should return a hash with separation of concerns analysis results
       {
-        setup_instructions: 7,
-        setup_instructions_reason: "README includes clear setup steps but missing environment requirements.",
-        technical_decisions: 6,
-        technical_decisions_reason: "Key architectural decisions are documented in comments, but rationale could be more detailed.",
-        assumptions: 4,
-        assumptions_reason: "Core assumptions about data structure are documented inline."
+        # Placeholder keys and values
       }
     end
 
-    def analyze_technical_implementation
+    def analyze_file_organization(ruby_files, js_files)
+      # Implementation of analyze_file_organization method
+      # This method should return a hash with file organization analysis results
       {
-        solution_correctness: 13,
-        solution_correctness_reason: "Core functionality works as expected with good edge case handling.",
-        error_handling: 4,
-        error_handling_reason: "Basic error cases are handled, but could use more robust validation.",
-        language_usage: 4,
-        language_usage_reason: "Good use of Ruby idioms, though some modern features could be utilized better."
+        # Placeholder keys and values
       }
     end
 
-    def analyze_problem_solving
+    def analyze_dependencies
+      # Implementation of analyze_dependencies method
+      # This method should return a hash with dependency management analysis results
+      {
+        # Placeholder keys and values
+      }
+    end
+
+    def analyze_framework_usage(ruby_files, js_files)
+      # Implementation of analyze_framework_usage method
+      # This method should return a hash with framework usage analysis results
+      {
+        # Placeholder keys and values
+      }
+    end
+
+    def analyze_development_practices(test_files, doc_files)
+      # Implementation of analyze_development_practices method
+      # This method should return a hash with development practices analysis results
+      {
+        # Placeholder keys and values
+      }
+    end
+
+    def analyze_problem_solving(ruby_files, js_files)
       {
         completeness: 9,
         completeness_reason: "All core requirements are met with good attention to detail.",
@@ -191,15 +259,33 @@ module Ai
       }
     end
 
-    def analyze_testing
+    def analyze_bonus_points(ruby_files, js_files, test_files)
+      # Implementation of analyze_bonus_points method
+      # This method should return a hash with bonus points analysis results
       {
-        coverage: 6,
-        coverage_reason: "Good coverage of core functionality, some edge cases missing.",
-        quality: 4,
-        quality_reason: "Tests are well-organized but could use more descriptive contexts.",
-        edge_cases: 2,
-        edge_cases_reason: "Basic edge cases covered, but missing some important scenarios."
+        # Placeholder keys and values
       }
+    end
+
+    def calculate_category_score(results)
+      results.sum { |r| r[:score] }
+    end
+
+    def calculate_weighted_score(score, category, subcategory)
+      max_score = case category
+      when :code_clarity
+        CLARITY_WEIGHTS[subcategory]
+      when :architecture
+        ARCHITECTURE_WEIGHTS[subcategory]
+      when :practices
+        PRACTICES_WEIGHTS[subcategory]
+      when :problem_solving
+        PROBLEM_SOLVING_WEIGHTS[subcategory]
+      when :bonus
+        BONUS_WEIGHTS[subcategory]
+      end
+
+      (score.to_f / 10 * max_score).round(1)
     end
   end
 end 
