@@ -10,11 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_03_19_000000) do
+ActiveRecord::Schema[8.0].define(version: 2024_02_28_152900) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "code_reviews", force: :cascade do |t|
+    t.string "repository_url", null: false
     t.string "candidate_name", null: false
     t.string "submission_url", null: false
     t.string "reviewer_name", null: false
@@ -25,7 +26,11 @@ ActiveRecord::Schema[8.0].define(version: 2024_03_19_000000) do
     t.jsonb "testing_scores", default: {}, null: false
     t.boolean "non_working_solution", default: false
     t.text "overall_comments"
+    t.text "error_message"
+    t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["repository_url"], name: "index_code_reviews_on_repository_url"
+    t.index ["status"], name: "index_code_reviews_on_status"
   end
 end
