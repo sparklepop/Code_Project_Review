@@ -3,4 +3,9 @@ div.card-body textarea.form-control {
   width: 97% !important;
   display: block;
   margin: 0 auto;
+}
+
+// Make number inputs wider to accommodate decimals
+.form-control[type="number"] {
+  width: 100px !important;  // Wide enough for decimals + spinner
 } 

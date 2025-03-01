@@ -54,11 +54,12 @@
         <div class="row align-items-center mb-2">
           <div class="col-md-3">Method Simplicity:</div>
           <div class="col-md-2">
-            <%= f.number_field "clarity_scores[method_simplicity][score]", 
-                class: "form-control", 
+            <%= f.number_field "clarity_scores[method_simplicity][weighted_score]", 
+                class: "form-control score-input", 
                 min: 0, 
                 max: 10,
-                value: @code_review.clarity_scores.dig("method_simplicity", "score") %>
+                step: 0.1,
+                value: @code_review.clarity_scores.dig("method_simplicity", "weighted_score") %>
           </div>
           <div class="col-md-2 text-muted">(max: 10)</div>
         </div>
@@ -76,11 +77,11 @@
         <div class="row align-items-center mb-2">
           <div class="col-md-3">Naming Conventions:</div>
           <div class="col-md-2">
-            <%= f.number_field "clarity_scores[naming_conventions][score]", 
+            <%= f.number_field "clarity_scores[naming_conventions][weighted_score]", 
                 class: "form-control", 
                 min: 0, 
                 max: 10,
-                value: @code_review.clarity_scores.dig("naming_conventions", "score") %>
+                value: @code_review.clarity_scores.dig("naming_conventions", "weighted_score") %>
           </div>
           <div class="col-md-2 text-muted">(max: 10)</div>
         </div>
@@ -96,11 +97,11 @@
         <div class="row align-items-center mb-2">
           <div class="col-md-3">Code Organization:</div>
           <div class="col-md-2">
-            <%= f.number_field "clarity_scores[code_organization][score]", 
+            <%= f.number_field "clarity_scores[code_organization][weighted_score]", 
                 class: "form-control", 
                 min: 0, 
                 max: 10,
-                value: @code_review.clarity_scores.dig("code_organization", "score") %>
+                value: @code_review.clarity_scores.dig("code_organization", "weighted_score") %>
           </div>
           <div class="col-md-2 text-muted">(max: 10)</div>
         </div>
@@ -116,11 +117,11 @@
         <div class="row align-items-center mb-2">
           <div class="col-md-3">Comments Quality:</div>
           <div class="col-md-2">
-            <%= f.number_field "clarity_scores[comments_quality][score]", 
+            <%= f.number_field "clarity_scores[comments_quality][weighted_score]", 
                 class: "form-control", 
                 min: 0, 
                 max: 5,
-                value: @code_review.clarity_scores.dig("comments_quality", "score") %>
+                value: @code_review.clarity_scores.dig("comments_quality", "weighted_score") %>
           </div>
           <div class="col-md-2 text-muted">(max: 5)</div>
         </div>
@@ -142,11 +143,11 @@
         <div class="row align-items-center mb-2">
           <div class="col-md-3">Separation of Concerns:</div>
           <div class="col-md-2">
-            <%= f.number_field "architecture_scores[separation_of_concerns][score]", 
+            <%= f.number_field "architecture_scores[separation_of_concerns][weighted_score]", 
                 class: "form-control", 
                 min: 0, 
                 max: 10,
-                value: @code_review.architecture_scores.dig("separation_of_concerns", "score") %>
+                value: @code_review.architecture_scores.dig("separation_of_concerns", "weighted_score") %>
           </div>
           <div class="col-md-2 text-muted">(max: 10)</div>
         </div>
@@ -162,11 +163,11 @@
         <div class="row align-items-center mb-2">
           <div class="col-md-3">File Organization:</div>
           <div class="col-md-2">
-            <%= f.number_field "architecture_scores[file_organization][score]", 
+            <%= f.number_field "architecture_scores[file_organization][weighted_score]", 
                 class: "form-control", 
                 min: 0, 
                 max: 5,
-                value: @code_review.architecture_scores.dig("file_organization", "score") %>
+                value: @code_review.architecture_scores.dig("file_organization", "weighted_score") %>
           </div>
           <div class="col-md-2 text-muted">(max: 5)</div>
         </div>
@@ -182,11 +183,11 @@
         <div class="row align-items-center mb-2">
           <div class="col-md-3">Dependency Management:</div>
           <div class="col-md-2">
-            <%= f.number_field "architecture_scores[dependency_management][score]", 
+            <%= f.number_field "architecture_scores[dependency_management][weighted_score]", 
                 class: "form-control", 
                 min: 0, 
                 max: 5,
-                value: @code_review.architecture_scores.dig("dependency_management", "score") %>
+                value: @code_review.architecture_scores.dig("dependency_management", "weighted_score") %>
           </div>
           <div class="col-md-2 text-muted">(max: 5)</div>
         </div>
@@ -202,11 +203,11 @@
         <div class="row align-items-center mb-2">
           <div class="col-md-3">Framework Usage:</div>
           <div class="col-md-2">
-            <%= f.number_field "architecture_scores[framework_usage][score]", 
+            <%= f.number_field "architecture_scores[framework_usage][weighted_score]", 
                 class: "form-control", 
                 min: 0, 
                 max: 5,
-                value: @code_review.architecture_scores.dig("framework_usage", "score") %>
+                value: @code_review.architecture_scores.dig("framework_usage", "weighted_score") %>
           </div>
           <div class="col-md-2 text-muted">(max: 5)</div>
         </div>
@@ -228,11 +229,11 @@
         <div class="row align-items-center mb-2">
           <div class="col-md-3">Commit Quality:</div>
           <div class="col-md-2">
-            <%= f.number_field "practices_scores[commit_quality][score]", 
+            <%= f.number_field "practices_scores[commit_quality][weighted_score]", 
                 class: "form-control", 
                 min: 0, 
                 max: 10,
-                value: @code_review.practices_scores.dig("commit_quality", "score") %>
+                value: @code_review.practices_scores.dig("commit_quality", "weighted_score") %>
           </div>
           <div class="col-md-2 text-muted">(max: 10)</div>
         </div>
@@ -248,11 +249,11 @@
         <div class="row align-items-center mb-2">
           <div class="col-md-3">Basic Testing:</div>
           <div class="col-md-2">
-            <%= f.number_field "practices_scores[basic_testing][score]", 
+            <%= f.number_field "practices_scores[basic_testing][weighted_score]", 
                 class: "form-control", 
                 min: 0, 
                 max: 10,
-                value: @code_review.practices_scores.dig("basic_testing", "score") %>
+                value: @code_review.practices_scores.dig("basic_testing", "weighted_score") %>
           </div>
           <div class="col-md-2 text-muted">(max: 10)</div>
         </div>
@@ -268,11 +269,11 @@
         <div class="row align-items-center mb-2">
           <div class="col-md-3">Documentation:</div>
           <div class="col-md-2">
-            <%= f.number_field "practices_scores[documentation][score]", 
+            <%= f.number_field "practices_scores[documentation][weighted_score]", 
                 class: "form-control", 
                 min: 0, 
                 max: 5,
-                value: @code_review.practices_scores.dig("documentation", "score") %>
+                value: @code_review.practices_scores.dig("documentation", "weighted_score") %>
           </div>
           <div class="col-md-2 text-muted">(max: 5)</div>
         </div>
@@ -294,11 +295,11 @@
         <div class="row align-items-center mb-2">
           <div class="col-md-3">Solution Simplicity:</div>
           <div class="col-md-2">
-            <%= f.number_field "problem_solving_scores[solution_simplicity][score]", 
+            <%= f.number_field "problem_solving_scores[solution_simplicity][weighted_score]", 
                 class: "form-control", 
                 min: 0, 
                 max: 10,
-                value: @code_review.problem_solving_scores.dig("solution_simplicity", "score") %>
+                value: @code_review.problem_solving_scores.dig("solution_simplicity", "weighted_score") %>
           </div>
           <div class="col-md-2 text-muted">(max: 10)</div>
         </div>
@@ -314,11 +315,11 @@
         <div class="row align-items-center mb-2">
           <div class="col-md-3">Code Reuse:</div>
           <div class="col-md-2">
-            <%= f.number_field "problem_solving_scores[code_reuse][score]", 
+            <%= f.number_field "problem_solving_scores[code_reuse][weighted_score]", 
                 class: "form-control", 
                 min: 0, 
                 max: 5,
-                value: @code_review.problem_solving_scores.dig("code_reuse", "score") %>
+                value: @code_review.problem_solving_scores.dig("code_reuse", "weighted_score") %>
           </div>
           <div class="col-md-2 text-muted">(max: 5)</div>
         </div>
@@ -340,11 +341,11 @@
         <div class="row align-items-center mb-2">
           <div class="col-md-3">Advanced Testing:</div>
           <div class="col-md-2">
-            <%= f.number_field "bonus_scores[advanced_testing][score]", 
+            <%= f.number_field "bonus_scores[advanced_testing][weighted_score]", 
                 class: "form-control", 
                 min: 0, 
                 max: 5,
-                value: @code_review.bonus_scores.dig("advanced_testing", "score") %>
+                value: @code_review.bonus_scores.dig("advanced_testing", "weighted_score") %>
           </div>
           <div class="col-md-2 text-muted">(max: 5)</div>
         </div>
@@ -360,11 +361,11 @@
         <div class="row align-items-center mb-2">
           <div class="col-md-3">Security Practices:</div>
           <div class="col-md-2">
-            <%= f.number_field "bonus_scores[security_practices][score]", 
+            <%= f.number_field "bonus_scores[security_practices][weighted_score]", 
                 class: "form-control", 
                 min: 0, 
                 max: 5,
-                value: @code_review.bonus_scores.dig("security_practices", "score") %>
+                value: @code_review.bonus_scores.dig("security_practices", "weighted_score") %>
           </div>
           <div class="col-md-2 text-muted">(max: 5)</div>
         </div>
@@ -380,11 +381,11 @@
         <div class="row align-items-center mb-2">
           <div class="col-md-3">Performance:</div>
           <div class="col-md-2">
-            <%= f.number_field "bonus_scores[performance_considerations][score]", 
+            <%= f.number_field "bonus_scores[performance_considerations][weighted_score]", 
                 class: "form-control", 
                 min: 0, 
                 max: 5,
-                value: @code_review.bonus_scores.dig("performance_considerations", "score") %>
+                value: @code_review.bonus_scores.dig("performance_considerations", "weighted_score") %>
           </div>
           <div class="col-md-2 text-muted">(max: 5)</div>
         </div>

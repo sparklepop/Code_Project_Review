@@ -49,7 +49,7 @@
           <div class="ms-4 mb-3">
             <div class="row mb-3">
               <div class="col-md-2">Method Simplicity:</div>
-              <div class="col-md-2"><%= @code_review.clarity_scores.dig("method_simplicity", "score") %> / 10</div>
+              <div class="col-md-2"><%= @code_review.clarity_scores.dig("method_simplicity", "weighted_score") %> / 10</div>
               <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
                 <%= @code_review.clarity_scores.dig("method_simplicity", "feedback") %>
@@ -58,7 +58,7 @@
 
             <div class="row mb-3">
               <div class="col-md-2">Naming Conventions:</div>
-              <div class="col-md-2"><%= @code_review.clarity_scores.dig("naming_conventions", "score") %> / 10</div>
+              <div class="col-md-2"><%= @code_review.clarity_scores.dig("naming_conventions", "weighted_score") %> / 10</div>
               <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
                 <%= @code_review.clarity_scores.dig("naming_conventions", "feedback") %>
@@ -67,7 +67,7 @@
 
             <div class="row mb-3">
               <div class="col-md-2">Code Organization:</div>
-              <div class="col-md-2"><%= @code_review.clarity_scores.dig("code_organization", "score") %> / 10</div>
+              <div class="col-md-2"><%= @code_review.clarity_scores.dig("code_organization", "weighted_score") %> / 10</div>
               <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
                 <%= @code_review.clarity_scores.dig("code_organization", "feedback") %>
@@ -76,7 +76,7 @@
 
             <div class="row mb-3">
               <div class="col-md-2">Comments Quality:</div>
-              <div class="col-md-2"><%= @code_review.clarity_scores.dig("comments_quality", "score") %> / 5</div>
+              <div class="col-md-2"><%= @code_review.clarity_scores.dig("comments_quality", "weighted_score") %> / 5</div>
               <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
                 <%= @code_review.clarity_scores.dig("comments_quality", "feedback") %>
@@ -95,7 +95,7 @@
           <div class="ms-4 mb-3">
             <div class="row mb-3">
               <div class="col-md-2">Commit Quality:</div>
-              <div class="col-md-2"><%= @code_review.practices_scores.dig("commit_quality", "score") %> / 10</div>
+              <div class="col-md-2"><%= @code_review.practices_scores.dig("commit_quality", "weighted_score") %> / 10</div>
               <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
                 <%= @code_review.practices_scores.dig("commit_quality", "feedback") %>
@@ -104,7 +104,7 @@
 
             <div class="row mb-3">
               <div class="col-md-2">Basic Testing:</div>
-              <div class="col-md-2"><%= @code_review.practices_scores.dig("basic_testing", "score") %> / 10</div>
+              <div class="col-md-2"><%= @code_review.practices_scores.dig("basic_testing", "weighted_score") %> / 10</div>
               <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
                 <%= @code_review.practices_scores.dig("basic_testing", "feedback") %>
@@ -113,7 +113,7 @@
 
             <div class="row mb-3">
               <div class="col-md-2">Documentation:</div>
-              <div class="col-md-2"><%= @code_review.practices_scores.dig("documentation", "score") %> / 5</div>
+              <div class="col-md-2"><%= @code_review.practices_scores.dig("documentation", "weighted_score") %> / 5</div>
               <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
                 <%= @code_review.practices_scores.dig("documentation", "feedback") %>
@@ -132,7 +132,7 @@
           <div class="ms-4 mb-3">
             <div class="row mb-3">
               <div class="col-md-2">Separation of Concerns:</div>
-              <div class="col-md-2"><%= @code_review.architecture_scores.dig("separation_of_concerns", "score") %> / 10</div>
+              <div class="col-md-2"><%= @code_review.architecture_scores.dig("separation_of_concerns", "weighted_score") %> / 10</div>
               <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
                 <%= @code_review.architecture_scores.dig("separation_of_concerns", "feedback") %>
@@ -141,7 +141,7 @@
 
             <div class="row mb-3">
               <div class="col-md-2">File Organization:</div>
-              <div class="col-md-2"><%= @code_review.architecture_scores.dig("file_organization", "score") %> / 5</div>
+              <div class="col-md-2"><%= @code_review.architecture_scores.dig("file_organization", "weighted_score") %> / 5</div>
               <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
                 <%= @code_review.architecture_scores.dig("file_organization", "feedback") %>
@@ -150,7 +150,7 @@
 
             <div class="row mb-3">
               <div class="col-md-2">Dependency Management:</div>
-              <div class="col-md-2"><%= @code_review.architecture_scores.dig("dependency_management", "score") %> / 5</div>
+              <div class="col-md-2"><%= @code_review.architecture_scores.dig("dependency_management", "weighted_score") %> / 5</div>
               <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
                 <%= @code_review.architecture_scores.dig("dependency_management", "feedback") %>
@@ -159,7 +159,7 @@
 
             <div class="row mb-3">
               <div class="col-md-2">Framework Usage:</div>
-              <div class="col-md-2"><%= @code_review.architecture_scores.dig("framework_usage", "score") %> / 5</div>
+              <div class="col-md-2"><%= @code_review.architecture_scores.dig("framework_usage", "weighted_score") %> / 5</div>
               <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
                 <%= @code_review.architecture_scores.dig("framework_usage", "feedback") %>
@@ -178,7 +178,7 @@
           <div class="ms-4 mb-3">
             <div class="row mb-3">
               <div class="col-md-2">Solution Simplicity:</div>
-              <div class="col-md-2"><%= @code_review.problem_solving_scores.dig("solution_simplicity", "score") %> / 10</div>
+              <div class="col-md-2"><%= @code_review.problem_solving_scores.dig("solution_simplicity", "weighted_score") %> / 10</div>
               <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
                 <%= @code_review.problem_solving_scores.dig("solution_simplicity", "feedback") %>
@@ -187,7 +187,7 @@
 
             <div class="row mb-3">
               <div class="col-md-2">Code Reuse:</div>
-              <div class="col-md-2"><%= @code_review.problem_solving_scores.dig("code_reuse", "score") %> / 5</div>
+              <div class="col-md-2"><%= @code_review.problem_solving_scores.dig("code_reuse", "weighted_score") %> / 5</div>
               <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
                 <%= @code_review.problem_solving_scores.dig("code_reuse", "feedback") %>
@@ -206,7 +206,7 @@
           <div class="ms-4 mb-3">
             <div class="row mb-3">
               <div class="col-md-2">Advanced Testing:</div>
-              <div class="col-md-2"><%= @code_review.bonus_scores.dig("advanced_testing", "score") %> / 5</div>
+              <div class="col-md-2"><%= @code_review.bonus_scores.dig("advanced_testing", "weighted_score") %> / 5</div>
               <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
                 <%= @code_review.bonus_scores.dig("advanced_testing", "feedback") %>
@@ -215,7 +215,7 @@
 
             <div class="row mb-3">
               <div class="col-md-2">Security Practices:</div>
-              <div class="col-md-2"><%= @code_review.bonus_scores.dig("security_practices", "score") %> / 5</div>
+              <div class="col-md-2"><%= @code_review.bonus_scores.dig("security_practices", "weighted_score") %> / 5</div>
               <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
                 <%= @code_review.bonus_scores.dig("security_practices", "feedback") %>
@@ -224,7 +224,7 @@
 
             <div class="row mb-3">
               <div class="col-md-2">Performance:</div>
-              <div class="col-md-2"><%= @code_review.bonus_scores.dig("performance_considerations", "score") %> / 5</div>
+              <div class="col-md-2"><%= @code_review.bonus_scores.dig("performance_considerations", "weighted_score") %> / 5</div>
               <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
                 <%= @code_review.bonus_scores.dig("performance_considerations", "feedback") %>

@@ -60,8 +60,20 @@ class CodeReview < ApplicationRecord
       analyzer = Ai::CodeReviewer.new(github_service.fetch_repository)
       results = analyzer.analyze
       
-      Rails.logger.debug "\n=== Raw Analysis Results ==="
-      Rails.logger.debug results.inspect
+      # Format all individual scores to one decimal place
+      [:clarity_scores, :architecture_scores, :practices_scores, :problem_solving_scores, :bonus_scores].each do |category|
+        results[category].each do |key, value|
+          if value.is_a?(Hash) && value["score"]
+            value["score"] = format("%.1f", value["score"].to_f)
+          end
+        end
+      end
+      
+      # Debug Problem Solving scores specifically
+      Rails.logger.debug "\n=== Problem Solving Scores Before Update ==="
+      Rails.logger.debug "Solution Simplicity: #{results.dig(:problem_solving_scores, :solution_simplicity, 'score')}"
+      Rails.logger.debug "Code Reuse: #{results.dig(:problem_solving_scores, :code_reuse, 'score')}"
+      Rails.logger.debug "Category Total: #{results.dig(:problem_solving_scores, :total_score)}"
       
       # Get category totals directly
       total = {
@@ -72,21 +84,14 @@ class CodeReview < ApplicationRecord
         bonus: results.dig(:bonus_scores, :total_score) || 0
       }
       
-      Rails.logger.debug "\n=== Category Totals ==="
-      total.each do |category, score|
-        Rails.logger.debug "#{category}: #{score}"
-      end
-      
       final_total = total.values.sum
-      Rails.logger.debug "\n=== Final Total Before Save ==="
-      Rails.logger.debug "final_total: #{final_total.inspect}"
       
       # Store category totals in their respective score hashes
-      results[:clarity_scores][:total_score] = total[:clarity]
-      results[:architecture_scores][:total_score] = total[:architecture]
-      results[:practices_scores][:total_score] = total[:practices]
-      results[:problem_solving_scores][:total_score] = total[:problem_solving]
-      results[:bonus_scores][:total_score] = total[:bonus]
+      results[:clarity_scores][:total_score] = format("%.1f", total[:clarity])
+      results[:architecture_scores][:total_score] = format("%.1f", total[:architecture])
+      results[:practices_scores][:total_score] = format("%.1f", total[:practices])
+      results[:problem_solving_scores][:total_score] = format("%.1f", total[:problem_solving])
+      results[:bonus_scores][:total_score] = format("%.1f", total[:bonus])
       
       result = update!(
         status: :completed,
@@ -95,12 +100,9 @@ class CodeReview < ApplicationRecord
         practices_scores: results[:practices_scores],
         problem_solving_scores: results[:problem_solving_scores],
         bonus_scores: results[:bonus_scores],
-        total_score: final_total,
+        total_score: format("%.1f", final_total),
         assessment_level: calculate_assessment_level(final_total)
       )
-      Rails.logger.debug "\n=== After Save ==="
-      Rails.logger.debug "Update result: #{result.inspect}"
-      Rails.logger.debug "Stored total_score: #{reload.total_score.inspect}"
     rescue => e
       Rails.logger.error "\n=== Error in Analysis ==="
       Rails.logger.error e.message
@@ -111,9 +113,14 @@ class CodeReview < ApplicationRecord
     end
   end
 
+  def formatted_score(score)
+    return "0.0" if score.nil?
+    format("%.1f", score.to_f)
+  end
+
   def total_score
-    # Use the actual total_score column
-    self[:total_score].to_f - (non_working_solution? ? 30 : 0)
+    score = self[:total_score].to_f - (non_working_solution? ? 30 : 0)
+    format("%.1f", score)
   end
 
   private
