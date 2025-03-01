@@ -13,12 +13,12 @@
     </div>
     <div class="card-body">
       <div class="row mb-3">
-        <div class="col-md-3"><strong>Candidate Name:</strong></div>
-        <div class="col-md-9"><%= @code_review.candidate_name %></div>
+        <div class="col-md-3"><strong>Repository URL:</strong></div>
+        <div class="col-md-9"><%= link_to @code_review.repository_url, @code_review.repository_url, target: '_blank' %></div>
       </div>
       <div class="row mb-3">
-        <div class="col-md-3"><strong>Submission URL:</strong></div>
-        <div class="col-md-9"><%= link_to @code_review.submission_url, @code_review.submission_url, target: '_blank' %></div>
+        <div class="col-md-3"><strong>Candidate:</strong></div>
+        <div class="col-md-9"><%= @code_review.candidate_name %></div>
       </div>
       <div class="row mb-3">
         <div class="col-md-3"><strong>Reviewer:</strong></div>
@@ -41,89 +41,178 @@
     </div>
     <div class="card-body">
       <!-- Code Quality -->
-      <h3>Code Quality and Style (<%= @code_review.calculate_quality_score %> / 35)</h3>
-      <div class="ms-4 mb-3">
-        <div class="row mb-2">
-          <div class="col-md-3">Code Clarity:</div>
-          <div class="col-md-2"><%= @code_review.quality_scores["code_clarity"] %> / 15</div>
-          <div class="col-md-7 text-secondary">
-            <%= @code_review.quality_scores["code_clarity_reason"] %>
-          </div>
+      <div class="card mb-4">
+        <div class="card-header">
+          <h2>Code Quality and Style (<%= @code_review.calculate_quality_score %> / 35)</h2>
         </div>
-        <div class="row mb-2">
-          <div class="col-md-3">Naming Conventions:</div>
-          <div class="col-md-2"><%= @code_review.quality_scores["naming_conventions"] %> / 10</div>
-          <div class="col-md-7 text-secondary">
-            <%= @code_review.quality_scores["naming_conventions_reason"] %>
+        <div class="card-body">
+          <div class="ms-4 mb-3">
+            <div class="row mb-3">
+              <div class="col-md-2">Code Clarity:</div>
+              <div class="col-md-2"><%= @code_review.quality_scores["code_clarity"] %> / 15</div>
+              <div class="col-md-2">Reason:</div>
+              <div class="col-md-6 text-secondary">
+                <%= @code_review.quality_scores["code_clarity_reason"] %>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-2">Naming Conventions:</div>
+              <div class="col-md-2"><%= @code_review.quality_scores["naming_conventions"] %> / 10</div>
+              <div class="col-md-2">Reason:</div>
+              <div class="col-md-6 text-secondary">
+                <%= @code_review.quality_scores["naming_conventions_reason"] %>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-2">Code Organization:</div>
+              <div class="col-md-2"><%= @code_review.quality_scores["code_organization"] %> / 10</div>
+              <div class="col-md-2">Reason:</div>
+              <div class="col-md-6 text-secondary">
+                <%= @code_review.quality_scores["code_organization_reason"] %>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="row">
-          <div class="col-md-4">Code Organization:</div>
-          <div class="col-md-8"><%= @code_review.quality_scores["code_organization"] %> / 10</div>
         </div>
       </div>
 
       <!-- Documentation -->
-      <h3>Documentation (<%= @code_review.calculate_documentation_score %> / 20)</h3>
-      <div class="ms-4 mb-3">
-        <div class="row">
-          <div class="col-md-4">Setup Instructions:</div>
-          <div class="col-md-8"><%= @code_review.documentation_scores["setup_instructions"] %> / 8</div>
+      <div class="card mb-4">
+        <div class="card-header">
+          <h2>Documentation (<%= @code_review.calculate_documentation_score %> / 20)</h2>
         </div>
-        <div class="row">
-          <div class="col-md-4">Technical Decisions:</div>
-          <div class="col-md-8"><%= @code_review.documentation_scores["technical_decisions"] %> / 7</div>
-        </div>
-        <div class="row">
-          <div class="col-md-4">Assumptions:</div>
-          <div class="col-md-8"><%= @code_review.documentation_scores["assumptions"] %> / 5</div>
+        <div class="card-body">
+          <div class="ms-4 mb-3">
+            <div class="row mb-3">
+              <div class="col-md-2">Setup Instructions:</div>
+              <div class="col-md-2"><%= @code_review.documentation_scores["setup_instructions"] %> / 8</div>
+              <div class="col-md-2">Reason:</div>
+              <div class="col-md-6 text-secondary">
+                <%= @code_review.documentation_scores["setup_instructions_reason"] %>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-2">Technical Decisions:</div>
+              <div class="col-md-2"><%= @code_review.documentation_scores["technical_decisions"] %> / 7</div>
+              <div class="col-md-2">Reason:</div>
+              <div class="col-md-6 text-secondary">
+                <%= @code_review.documentation_scores["technical_decisions_reason"] %>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-2">Assumptions:</div>
+              <div class="col-md-2"><%= @code_review.documentation_scores["assumptions"] %> / 5</div>
+              <div class="col-md-2">Reason:</div>
+              <div class="col-md-6 text-secondary">
+                <%= @code_review.documentation_scores["assumptions_reason"] %>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Technical Implementation -->
-      <h3>Technical Implementation (<%= @code_review.calculate_technical_score %> / 25)</h3>
-      <div class="ms-4 mb-3">
-        <div class="row">
-          <div class="col-md-4">Solution Correctness:</div>
-          <div class="col-md-8"><%= @code_review.technical_scores["solution_correctness"] %> / 15</div>
+      <div class="card mb-4">
+        <div class="card-header">
+          <h2>Technical Implementation (<%= @code_review.calculate_technical_score %> / 25)</h2>
         </div>
-        <div class="row">
-          <div class="col-md-4">Error Handling:</div>
-          <div class="col-md-8"><%= @code_review.technical_scores["error_handling"] %> / 5</div>
-        </div>
-        <div class="row">
-          <div class="col-md-4">Language Usage:</div>
-          <div class="col-md-8"><%= @code_review.technical_scores["language_usage"] %> / 5</div>
+        <div class="card-body">
+          <div class="ms-4 mb-3">
+            <div class="row mb-3">
+              <div class="col-md-2">Solution Correctness:</div>
+              <div class="col-md-2"><%= @code_review.technical_scores["solution_correctness"] %> / 15</div>
+              <div class="col-md-2">Reason:</div>
+              <div class="col-md-6 text-secondary">
+                <%= @code_review.technical_scores["solution_correctness_reason"] %>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-2">Error Handling:</div>
+              <div class="col-md-2"><%= @code_review.technical_scores["error_handling"] %> / 5</div>
+              <div class="col-md-2">Reason:</div>
+              <div class="col-md-6 text-secondary">
+                <%= @code_review.technical_scores["error_handling_reason"] %>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-2">Language Usage:</div>
+              <div class="col-md-2"><%= @code_review.technical_scores["language_usage"] %> / 5</div>
+              <div class="col-md-2">Reason:</div>
+              <div class="col-md-6 text-secondary">
+                <%= @code_review.technical_scores["language_usage_reason"] %>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Problem Solving -->
-      <h3>Problem Solving (<%= @code_review.calculate_problem_solving_score %> / 20)</h3>
-      <div class="ms-4 mb-3">
-        <div class="row">
-          <div class="col-md-4">Completeness:</div>
-          <div class="col-md-8"><%= @code_review.problem_solving_scores["completeness"] %> / 10</div>
+      <div class="card mb-4">
+        <div class="card-header">
+          <h2>Problem Solving (<%= @code_review.calculate_problem_solving_score %> / 20)</h2>
         </div>
-        <div class="row">
-          <div class="col-md-4">Approach:</div>
-          <div class="col-md-8"><%= @code_review.problem_solving_scores["approach"] %> / 10</div>
+        <div class="card-body">
+          <div class="ms-4 mb-3">
+            <div class="row mb-3">
+              <div class="col-md-2">Completeness:</div>
+              <div class="col-md-2"><%= @code_review.problem_solving_scores["completeness"] %> / 10</div>
+              <div class="col-md-2">Reason:</div>
+              <div class="col-md-6 text-secondary">
+                <%= @code_review.problem_solving_scores["completeness_reason"] %>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-2">Approach:</div>
+              <div class="col-md-2"><%= @code_review.problem_solving_scores["approach"] %> / 10</div>
+              <div class="col-md-2">Reason:</div>
+              <div class="col-md-6 text-secondary">
+                <%= @code_review.problem_solving_scores["approach_reason"] %>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Testing Bonus -->
-      <h3>Testing Bonus (<%= @code_review.calculate_testing_bonus %> / 15)</h3>
-      <div class="ms-4 mb-3">
-        <div class="row">
-          <div class="col-md-4">Coverage:</div>
-          <div class="col-md-8"><%= @code_review.testing_scores["coverage"] %> / 7</div>
+      <div class="card mb-4">
+        <div class="card-header">
+          <h2>Testing Bonus (<%= @code_review.calculate_testing_bonus %> / 15)</h2>
         </div>
-        <div class="row">
-          <div class="col-md-4">Quality:</div>
-          <div class="col-md-8"><%= @code_review.testing_scores["quality"] %> / 5</div>
-        </div>
-        <div class="row">
-          <div class="col-md-4">Edge Cases:</div>
-          <div class="col-md-8"><%= @code_review.testing_scores["edge_cases"] %> / 3</div>
+        <div class="card-body">
+          <div class="ms-4 mb-3">
+            <div class="row mb-3">
+              <div class="col-md-2">Coverage:</div>
+              <div class="col-md-2"><%= @code_review.testing_scores["coverage"] %> / 7</div>
+              <div class="col-md-2">Reason:</div>
+              <div class="col-md-6 text-secondary">
+                <%= @code_review.testing_scores["coverage_reason"] %>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-2">Quality:</div>
+              <div class="col-md-2"><%= @code_review.testing_scores["quality"] %> / 5</div>
+              <div class="col-md-2">Reason:</div>
+              <div class="col-md-6 text-secondary">
+                <%= @code_review.testing_scores["quality_reason"] %>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-2">Edge Cases:</div>
+              <div class="col-md-2"><%= @code_review.testing_scores["edge_cases"] %> / 3</div>
+              <div class="col-md-2">Reason:</div>
+              <div class="col-md-6 text-secondary">
+                <%= @code_review.testing_scores["edge_cases_reason"] %>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

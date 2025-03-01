@@ -1,13 +1,14 @@
 class CodeReview < ApplicationRecord
-  validates :candidate_name, presence: true
-  validates :submission_url, presence: true
-  validates :reviewer_name, presence: true
-  validates :quality_scores, presence: true
   validates :repository_url, presence: true, format: { 
-    with: %r{\Ahttps://github\.com/[^/]+/[^/]+\z},
+    with: %r{\Ahttps://github\.com/[^/]+/[^/]+(?:\.git)?\z},
     message: "must be a valid GitHub repository URL"
   }
   
+  # Make these optional initially
+  validates :candidate_name, presence: true, on: :update
+  validates :reviewer_name, presence: true, on: :update
+  validates :quality_scores, presence: true, on: :update
+
   # Add accessors for score attributes
   store_accessor :quality_scores, :code_clarity, :naming_conventions, :code_organization
   store_accessor :documentation_scores, :setup_instructions, :technical_decisions, :assumptions
@@ -18,7 +19,9 @@ class CodeReview < ApplicationRecord
   # Initialize and convert scores before save
   before_validation :process_scores
 
-  enum status: {
+  attribute :status, :integer, default: 0
+
+  enum :status, {
     pending: 0,
     processing: 1,
     completed: 2,
@@ -83,8 +86,28 @@ class CodeReview < ApplicationRecord
     %w[setup_instructions setup_instructions_reason technical_decisions technical_decisions_reason assumptions assumptions_reason]
   end
 
-  def queue_analysis
-    CodeReviewAnalysisJob.perform_later(self)
+  def analyze_repository
+    github_service = Github::RepositoryService.new(repository_url, id)
+    
+    begin
+      update_column(:status, CodeReview.statuses[:processing])  # Skip validations
+      analyzer = Ai::CodeReviewer.new(github_service.fetch_repository)
+      results = analyzer.analyze
+      
+      update!(
+        status: :completed,
+        quality_scores: results[:quality_scores] || {},
+        documentation_scores: results[:documentation_scores] || {},
+        technical_scores: results[:technical_scores] || {},
+        problem_solving_scores: results[:problem_solving_scores] || {},
+        testing_scores: results[:testing_scores] || {}
+      )
+    rescue => e
+      update_column(:status, CodeReview.statuses[:failed])  # Skip validations
+      update_column(:error_message, e.message)
+    ensure
+      github_service&.cleanup
+    end
   end
 
   private

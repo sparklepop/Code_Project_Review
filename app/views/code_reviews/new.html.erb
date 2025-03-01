@@ -1,4 +1,4 @@
-<div class="container mt-4" data-controller="code-review" data-code-review-debug-value="true">
+<div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>New Code Review</h1>
     <div>
@@ -8,14 +8,40 @@
 
   <div class="review-form-container">
     <%= form_with(model: @code_review, local: true) do |f| %>
-      <div class="field">
-        <%= f.label :repository_url, "GitHub Repository URL" %>
+      <% if @code_review.errors.any? %>
+        <div class="alert alert-danger">
+          <h2><%= pluralize(@code_review.errors.count, "error") %> prohibited this review from being saved:</h2>
+          <ul>
+            <% @code_review.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="field mb-3">
+        <%= f.label :repository_url, "GitHub Repository URL", class: "form-label" %>
         <%= f.text_field :repository_url, 
-                         placeholder: "https://github.com/username/repository",
-                         required: true %>
+                        placeholder: "https://github.com/username/repository",
+                        class: "form-control",
+                        required: true %>
+      </div>
+
+      <div class="field mb-3">
+        <%= f.label :candidate_name, "Candidate Name", class: "form-label" %>
+        <%= f.text_field :candidate_name, 
+                        class: "form-control",
+                        required: true %>
+      </div>
+
+      <div class="field mb-3">
+        <%= f.label :reviewer_name, "Reviewer Name", class: "form-label" %>
+        <%= f.text_field :reviewer_name, 
+                        class: "form-control",
+                        required: true %>
       </div>
       
-      <%= f.submit "Start Code Review", class: "button" %>
+      <%= f.submit "Start Code Review", class: "btn btn-primary" %>
     <% end %>
   </div>
 </div> 

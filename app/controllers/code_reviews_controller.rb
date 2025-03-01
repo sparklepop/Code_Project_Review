@@ -8,38 +8,12 @@ class CodeReviewsController < ApplicationController
   end
 
   def create
-    puts "\n\n=== RECEIVED PARAMS ==="
-    puts JSON.pretty_generate(params.to_unsafe_h)
-    puts "======================="
-
-    processed_params = code_review_params
-    puts "\n=== PROCESSED PARAMS ==="
-    puts JSON.pretty_generate(processed_params)
-    puts "======================="
-
-    @code_review = CodeReview.new(processed_params)
-    puts "\n=== BEFORE SAVE ==="
-    puts JSON.pretty_generate(@code_review.attributes)
-    puts "======================="
+    @code_review = CodeReview.new(code_review_params)
     
     if @code_review.save
-      saved_review = @code_review.reload
-      puts "\n=== SAVED TO DATABASE ==="
-      puts "ID: #{saved_review.id}"
-      puts "Quality Scores: #{saved_review.quality_scores.inspect}"
-      puts "Documentation Scores: #{saved_review.documentation_scores.inspect}"
-      puts "Technical Scores: #{saved_review.technical_scores.inspect}"
-      puts "Problem Solving Scores: #{saved_review.problem_solving_scores.inspect}"
-      puts "Testing Scores: #{saved_review.testing_scores.inspect}"
-      puts "======================="
-      
+      @code_review.analyze_repository
       redirect_to @code_review, notice: 'Code review was successfully created.'
     else
-      puts "\n=== SAVE FAILED ==="
-      puts "Errors: #{@code_review.errors.full_messages}"
-      puts "Current attributes: #{@code_review.attributes.inspect}"
-      puts "======================="
-      
       render :new, status: :unprocessable_entity
     end
   end
@@ -203,8 +177,8 @@ class CodeReviewsController < ApplicationController
 
   def code_review_params
     processed_params = params.require(:code_review).permit(
+      :repository_url,
       :candidate_name,
-      :submission_url,
       :reviewer_name,
       :non_working_solution,
       :overall_comments
