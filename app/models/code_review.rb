@@ -60,6 +60,9 @@ class CodeReview < ApplicationRecord
       analyzer = Ai::CodeReviewer.new(github_service.fetch_repository)
       results = analyzer.analyze
       
+      Rails.logger.debug "\n=== Analysis Results Before Processing ==="
+      Rails.logger.debug "Raw Results: #{results.inspect}"
+      
       # Format all individual scores to one decimal place
       [:clarity_scores, :architecture_scores, :practices_scores, :problem_solving_scores, :bonus_scores].each do |category|
         results[category].each do |key, value|
@@ -69,11 +72,12 @@ class CodeReview < ApplicationRecord
         end
       end
       
-      # Debug Problem Solving scores specifically
-      Rails.logger.debug "\n=== Problem Solving Scores Before Update ==="
-      Rails.logger.debug "Solution Simplicity: #{results.dig(:problem_solving_scores, :solution_simplicity, 'score')}"
-      Rails.logger.debug "Code Reuse: #{results.dig(:problem_solving_scores, :code_reuse, 'score')}"
-      Rails.logger.debug "Category Total: #{results.dig(:problem_solving_scores, :total_score)}"
+      Rails.logger.debug "\n=== Scores After Formatting ==="
+      Rails.logger.debug "Clarity: #{results[:clarity_scores].inspect}"
+      Rails.logger.debug "Architecture: #{results[:architecture_scores].inspect}"
+      Rails.logger.debug "Practices: #{results[:practices_scores].inspect}"
+      Rails.logger.debug "Problem Solving: #{results[:problem_solving_scores].inspect}"
+      Rails.logger.debug "Bonus: #{results[:bonus_scores].inspect}"
       
       # Get category totals directly
       total = {
@@ -84,7 +88,12 @@ class CodeReview < ApplicationRecord
         bonus: results.dig(:bonus_scores, :total_score) || 0
       }
       
+      Rails.logger.debug "\n=== Category Totals ==="
+      Rails.logger.debug total.inspect
+      
       final_total = total.values.sum
+      Rails.logger.debug "\n=== Final Total ==="
+      Rails.logger.debug final_total.inspect
       
       # Store category totals in their respective score hashes
       results[:clarity_scores][:total_score] = format("%.1f", total[:clarity])
@@ -92,6 +101,16 @@ class CodeReview < ApplicationRecord
       results[:practices_scores][:total_score] = format("%.1f", total[:practices])
       results[:problem_solving_scores][:total_score] = format("%.1f", total[:problem_solving])
       results[:bonus_scores][:total_score] = format("%.1f", total[:bonus])
+      
+      Rails.logger.debug "\n=== Before Database Update ==="
+      Rails.logger.debug "Status: #{:completed}"
+      Rails.logger.debug "Clarity Scores: #{results[:clarity_scores].inspect}"
+      Rails.logger.debug "Architecture Scores: #{results[:architecture_scores].inspect}"
+      Rails.logger.debug "Practices Scores: #{results[:practices_scores].inspect}"
+      Rails.logger.debug "Problem Solving Scores: #{results[:problem_solving_scores].inspect}"
+      Rails.logger.debug "Bonus Scores: #{results[:bonus_scores].inspect}"
+      Rails.logger.debug "Total Score: #{format("%.1f", final_total)}"
+      Rails.logger.debug "Assessment Level: #{calculate_assessment_level(final_total)}"
       
       result = update!(
         status: :completed,
@@ -103,9 +122,21 @@ class CodeReview < ApplicationRecord
         total_score: format("%.1f", final_total),
         assessment_level: calculate_assessment_level(final_total)
       )
+      
+      Rails.logger.debug "\n=== After Database Update ==="
+      Rails.logger.debug "Update Result: #{result.inspect}"
+      Rails.logger.debug "Saved Clarity Scores: #{clarity_scores.inspect}"
+      Rails.logger.debug "Saved Architecture Scores: #{architecture_scores.inspect}"
+      Rails.logger.debug "Saved Practices Scores: #{practices_scores.inspect}"
+      Rails.logger.debug "Saved Problem Solving Scores: #{problem_solving_scores.inspect}"
+      Rails.logger.debug "Saved Bonus Scores: #{bonus_scores.inspect}"
+      Rails.logger.debug "Saved Total Score: #{total_score}"
+      Rails.logger.debug "Saved Assessment Level: #{assessment_level}"
+      
     rescue => e
       Rails.logger.error "\n=== Error in Analysis ==="
       Rails.logger.error e.message
+      Rails.logger.error e.backtrace.join("\n")
       update_column(:status, CodeReview.statuses[:failed])
       update_column(:error_message, e.message)
     ensure
