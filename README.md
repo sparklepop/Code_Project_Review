@@ -25,58 +25,57 @@ Things you may want to cover:
 
 ## Code Review Rubric
 
-Our code review process evaluates submissions across several key areas, with a focus on clarity, simplicity, and maintainable code. The total possible score is 115 points.
+Our code review process evaluates submissions across several key areas, with a focus on clarity, simplicity, and maintainable code. The total possible score is 130 points.
 
-### Code Clarity (35 points)
+### Code Clarity (45 points)
 We value readable, well-organized code that is easy to maintain.
 
 | Category | Points | What We Look For |
 |----------|--------|------------------|
-| Naming Conventions | 10 | - Clear, descriptive names for variables, methods, and classes<br>- Consistent naming patterns<br>- Language-appropriate conventions |
-| Method Simplicity | 10 | - Short, focused methods<br>- Single responsibility principle<br>- Clear purpose and intent |
+| Naming Conventions | 15 | - Clear, descriptive names for variables, methods, and classes<br>- Consistent naming patterns<br>- Language-appropriate conventions |
+| Method Simplicity | 15 | - Short, focused methods<br>- Single responsibility principle<br>- Clear purpose and intent |
 | Code Organization | 10 | - Logical file/folder structure<br>- Related code grouped together<br>- Easy to navigate |
 | Comments Quality | 5 | - Helpful comments explaining "why" not "what"<br>- Clear documentation where needed<br>- Not excessive or redundant |
 
-### Architectural Choices (25 points)
+### Architectural Choices (15 points)
 We value good separation of concerns and appropriate use of framework features.
 
 | Category | Points | What We Look For |
 |----------|--------|------------------|
-| Separation of Concerns | 10 | - Business logic in appropriate places<br>- Fat models, skinny controllers<br>- Clear responsibilities |
+| Separation of Concerns | 5 | - Business logic in appropriate places<br>- Fat models, skinny controllers<br>- Clear responsibilities |
 | File Organization | 5 | - Follows framework conventions<br>- Consistent structure<br>- Logical grouping |
-| Dependency Management | 5 | - Clear purpose for dependencies<br>- Up-to-date versions<br>- No unnecessary dependencies |
 | Framework Usage | 5 | - Appropriate use of framework features<br>- Following framework conventions<br>- Not fighting the framework |
 
-### Development Practices (25 points)
+### Development Practices (30 points)
 We value good development practices that make code easier to maintain and collaborate on.
 
 | Category | Points | What We Look For |
 |----------|--------|------------------|
-| Commit Quality | 10 | - Small, focused commits<br>- Clear commit messages<br>- Logical commit history |
-| Basic Testing | 10 | - Fundamental test coverage<br>- Key functionality tested<br>- Tests are readable |
-| Documentation | 5 | - Clear README<br>- Setup instructions<br>- Key decisions documented |
+| Commit Quality | 15 | - Small, focused commits<br>- Clear commit messages<br>- Logical commit history |
+| Documentation | 10 | - Clear README<br>- Setup instructions<br>- Key decisions documented |
+| Code Standards | 5 | - Consistent formatting<br>- Language conventions<br>- Best practices followed |
 
-### Problem Solving (15 points)
+### Problem Solving (25 points)
 We value simple, effective solutions over clever complexity.
 
 | Category | Points | What We Look For |
 |----------|--------|------------------|
-| Solution Simplicity | 10 | - Straightforward approaches<br>- Avoiding unnecessary complexity<br>- Clear problem-solving logic |
-| Code Reuse | 5 | - DRY without over-abstraction<br>- Appropriate shared code<br>- Balance of reuse vs. simplicity |
+| Solution Simplicity | 15 | - Straightforward approaches<br>- Avoiding unnecessary complexity<br>- Clear problem-solving logic |
+| Code Reuse | 10 | - DRY without over-abstraction<br>- Appropriate shared code<br>- Balance of reuse vs. simplicity |
 
 ### Bonus Points (15 points)
-Additional points for going above and beyond the basics.
+Additional points for testing practices.
 
 | Category | Points | What We Look For |
 |----------|--------|------------------|
-| Advanced Testing | 5 | - Edge case coverage<br>- Integration tests<br>- Test organization |
-| Security Practices | 5 | - Basic security considerations<br>- Input validation<br>- Data protection |
-| Performance Considerations | 5 | - Obvious bottlenecks addressed<br>- Efficient algorithms<br>- Resource usage |
+| Basic Testing | 8 | - Framework tests present<br>- Basic unit tests<br>- Key functionality tested |
+| Test Coverage | 4 | - Core functionality coverage<br>- Multiple test cases<br>- Edge case handling |
+| Test Organization | 3 | - Well-structured test files<br>- Test helpers and shared examples<br>- Clear test patterns |
 
 ## Notes
 - This rubric is language-agnostic and applies to all submissions
 - We prefer simple, maintainable solutions over clever, complex ones
-- Basic testing is valued, but extensive test coverage is not required
+- Basic testing is valued and will earn bonus points
 - Small, focused commits are highly valued for easier maintenance
 
 ## Review Process

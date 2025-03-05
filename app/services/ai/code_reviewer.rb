@@ -1,10 +1,10 @@
 module Ai
   class CodeReviewer
     SCORE_WEIGHTS = {
-      code_clarity: 35,
-      architecture: 25,
-      practices: 25,
-      problem_solving: 15,
+      code_clarity: 45,
+      architecture: 15,
+      practices: 30,
+      problem_solving: 25,
       bonus: 15
     }.freeze
 
@@ -34,9 +34,9 @@ module Ai
     }.freeze
 
     BONUS_WEIGHTS = {
-      advanced_testing: 5,
-      security_practices: 5,
-      performance_considerations: 5
+      basic_testing: 8,
+      test_coverage: 4,
+      test_organization: 3
     }.freeze
 
     def initialize(repo_path)
@@ -2249,34 +2249,302 @@ module Ai
     end
 
     def analyze_bonus_points(ruby_files, js_files, test_files)
-      # Get individual scores
-      testing_score = {
-        score: 4,
-        feedback: "Some advanced testing patterns present"
+      issues = []
+      good_examples = []
+      
+      # Initialize metrics
+      metrics = {
+        test_stats: {
+          framework_tests: 0,
+          unit_tests: 0,
+          test_count: 0,
+          assertions: 0
+        },
+        coverage: {
+          core_functions_tested: Set.new,
+          core_functions_total: Set.new
+        },
+        organization: {
+          test_directories: Set.new,
+          helper_modules: 0,
+          shared_examples: 0
+        }
       }
-      security_score = {
-        score: 3,
-        feedback: "Basic security considerations implemented"
-      }
-      performance_score = {
-        score: 3,
-        feedback: "Some performance optimizations present"
-      }
-
-      # Calculate weighted scores
-      weighted_testing = calculate_weighted_score(testing_score[:score], :bonus, :advanced_testing)
-      weighted_security = calculate_weighted_score(security_score[:score], :bonus, :security_practices)
-      weighted_performance = calculate_weighted_score(performance_score[:score], :bonus, :performance_considerations)
-
-      # Calculate total
-      total = weighted_testing + weighted_security + weighted_performance
-
+      
+      # Analyze test files
+      test_files.each do |path, content|
+        analyze_test_file(path, content, metrics, issues, good_examples)
+      end
+      
+      # Calculate scores
+      basic_testing_score = calculate_basic_testing_score(metrics)
+      coverage_score = calculate_test_coverage_score(metrics)
+      organization_score = calculate_test_organization_score(metrics)
+      
+      # Generate feedback
+      feedback = generate_testing_feedback(metrics, issues, good_examples)
+      
       {
-        advanced_testing: testing_score.merge(weighted_score: weighted_testing),
-        security_practices: security_score.merge(weighted_score: weighted_security),
-        performance_considerations: performance_score.merge(weighted_score: weighted_performance),
-        total_score: total
+        basic_testing: {
+          score: basic_testing_score,
+          weight: BONUS_WEIGHTS[:basic_testing],
+          weighted_score: (basic_testing_score * BONUS_WEIGHTS[:basic_testing] / 10.0).round(1)
+        },
+        test_coverage: {
+          score: coverage_score,
+          weight: BONUS_WEIGHTS[:test_coverage],
+          weighted_score: (coverage_score * BONUS_WEIGHTS[:test_coverage] / 10.0).round(1)
+        },
+        test_organization: {
+          score: organization_score,
+          weight: BONUS_WEIGHTS[:test_organization],
+          weighted_score: (organization_score * BONUS_WEIGHTS[:test_organization] / 10.0).round(1)
+        },
+        feedback: feedback,
+        details: {
+          issues: issues,
+          good_examples: good_examples,
+          metrics: metrics
+        }
       }
+    end
+
+    private
+
+    def analyze_test_file(path, content, metrics, issues, good_examples)
+      # Detect test framework
+      framework = detect_test_framework(path, content)
+      
+      case framework
+      when :rspec
+        analyze_rspec_tests(path, content, metrics, issues, good_examples)
+      when :minitest
+        analyze_minitest_tests(path, content, metrics, issues, good_examples)
+      when :jest
+        analyze_jest_tests(path, content, metrics, issues, good_examples)
+      end
+      
+      # Track test organization
+      metrics[:organization][:test_directories].add(File.dirname(path))
+      
+      # Check for test helpers and shared examples
+      if content.match?(/\b(shared_examples|shared_context|before|after|around)\b/)
+        metrics[:organization][:helper_modules] += 1
+      end
+      
+      if content.match?(/\b(shared_examples|shared_context)\b/)
+        metrics[:organization][:shared_examples] += 1
+      end
+    end
+
+    def detect_test_framework(path, content)
+      if path.include?('spec/') || content.include?('RSpec')
+        :rspec
+      elsif path.include?('test/') || content.include?('Minitest')
+        :minitest
+      elsif content.include?('describe') && content.include?('it') && 
+            (path.end_with?('.test.js') || path.end_with?('.spec.js'))
+        :jest
+      end
+    end
+
+    def analyze_rspec_tests(path, content, metrics, issues, good_examples)
+      # Count tests and assertions
+      metrics[:test_stats][:test_count] += content.scan(/\bit\s+['"]/).size
+      metrics[:test_stats][:assertions] += content.scan(/\b(expect|should|assert)\b/).size
+      
+      # Identify tested functions
+      content.scan(/describe\s+['"](.+?)['"]/).each do |match|
+        metrics[:coverage][:core_functions_tested].add(match[0])
+      end
+      
+      # Check for good testing practices
+      if content.match?(/\b(before|let|subject|context)\b/)
+        good_examples << {
+          file: path,
+          note: "Good use of RSpec helpers and context"
+        }
+      end
+      
+      # Check for test organization
+      if content.match?(/\b(shared_examples|shared_context)\b/)
+        good_examples << {
+          file: path,
+          note: "Good use of shared examples for test organization"
+        }
+      end
+    end
+
+    def analyze_minitest_tests(path, content, metrics, issues, good_examples)
+      # Count tests and assertions
+      metrics[:test_stats][:test_count] += content.scan(/\bdef\s+test_/).size
+      metrics[:test_stats][:assertions] += content.scan(/\b(assert|refute)\w*\b/).size
+      
+      # Identify tested functions
+      content.scan(/test_(\w+)/).each do |match|
+        metrics[:coverage][:core_functions_tested].add(match[0])
+      end
+      
+      # Check for good testing practices
+      if content.match?(/\b(setup|teardown|before|after)\b/)
+        good_examples << {
+          file: path,
+          note: "Good use of Minitest lifecycle hooks"
+        }
+      end
+    end
+
+    def analyze_jest_tests(path, content, metrics, issues, good_examples)
+      # Count tests and assertions
+      metrics[:test_stats][:test_count] += content.scan(/\bit\s*\(/).size
+      metrics[:test_stats][:assertions] += content.scan(/\b(expect|assert)\b/).size
+      
+      # Identify tested functions
+      content.scan(/describe\s*\(['"](.+?)['"]/).each do |match|
+        metrics[:coverage][:core_functions_tested].add(match[0])
+      end
+      
+      # Check for good testing practices
+      if content.match?(/\b(beforeEach|afterEach|beforeAll|afterAll)\b/)
+        good_examples << {
+          file: path,
+          note: "Good use of Jest lifecycle hooks"
+        }
+      end
+      
+      # Check for test organization
+      if content.match?(/\b(describe|context)\b/)
+        good_examples << {
+          file: path,
+          note: "Well-organized test structure with describe blocks"
+        }
+      end
+    end
+
+    def calculate_basic_testing_score(metrics)
+      score = 10.0
+      
+      # Basic presence of tests
+      if metrics[:test_stats][:test_count] == 0
+        return 0
+      end
+      
+      # Deduct for low test count
+      if metrics[:test_stats][:test_count] < 5
+        score -= 3
+      elsif metrics[:test_stats][:test_count] < 10
+        score -= 1.5
+      end
+      
+      # Deduct for low assertion count
+      assertions_per_test = metrics[:test_stats][:assertions].to_f / metrics[:test_stats][:test_count]
+      if assertions_per_test < 1
+        score -= 2
+      elsif assertions_per_test < 2
+        score -= 1
+      end
+      
+      score.clamp(0, 10)
+    end
+
+    def calculate_test_coverage_score(metrics)
+      score = 10.0
+      
+      # Calculate coverage ratio if we have identified core functions
+      if metrics[:coverage][:core_functions_total].any?
+        coverage_ratio = metrics[:coverage][:core_functions_tested].size.to_f / 
+                        metrics[:coverage][:core_functions_total].size
+        
+        if coverage_ratio < 0.5
+          score -= 5
+        elsif coverage_ratio < 0.7
+          score -= 3
+        elsif coverage_ratio < 0.9
+          score -= 1
+        end
+      else
+        # If we couldn't identify core functions, use test count as a proxy
+        if metrics[:test_stats][:test_count] < 5
+          score -= 5
+        elsif metrics[:test_stats][:test_count] < 10
+          score -= 3
+        end
+      end
+      
+      score.clamp(0, 10)
+    end
+
+    def calculate_test_organization_score(metrics)
+      score = 10.0
+      
+      # Check test directory structure
+      if metrics[:organization][:test_directories].size < 2
+        score -= 2 # Basic test organization
+      end
+      
+      # Check for test helpers and shared examples
+      if metrics[:organization][:helper_modules] == 0
+        score -= 3 # No test helpers or setup
+      end
+      
+      if metrics[:organization][:shared_examples] == 0
+        score -= 2 # No shared examples or contexts
+      end
+      
+      score.clamp(0, 10)
+    end
+
+    def generate_testing_feedback(metrics, issues, good_examples)
+      feedback = []
+      
+      # Overall testing assessment
+      if metrics[:test_stats][:test_count] == 0
+        feedback << "No tests found. Consider adding basic tests for core functionality."
+      else
+        feedback << "Found #{metrics[:test_stats][:test_count]} tests with #{metrics[:test_stats][:assertions]} assertions."
+      end
+      
+      # Coverage assessment
+      if metrics[:coverage][:core_functions_tested].any?
+        coverage_ratio = metrics[:coverage][:core_functions_tested].size.to_f / 
+                        [metrics[:coverage][:core_functions_total].size, 1].max
+        
+        feedback << case coverage_ratio
+          when 0.8..1.0
+            "Excellent test coverage of core functionality."
+          when 0.5..0.8
+            "Good test coverage with room for improvement."
+          else
+            "Consider adding more tests to cover core functionality."
+        end
+      end
+      
+      # Organization assessment
+      if metrics[:organization][:helper_modules] > 0
+        feedback << "Good use of test helpers and setup."
+      end
+      
+      if metrics[:organization][:shared_examples] > 0
+        feedback << "Good use of shared examples and test organization."
+      end
+      
+      # Highlight good examples
+      if good_examples.any?
+        feedback << "\nGood testing practices:"
+        good_examples.take(2).each do |example|
+          feedback << "- #{example[:note]}"
+        end
+      end
+      
+      # Suggest improvements
+      if issues.any?
+        feedback << "\nSuggested testing improvements:"
+        issues.each do |issue|
+          feedback << "- #{issue[:suggestion]}"
+        end
+      end
+      
+      feedback.join("\n")
     end
 
     def calculate_weighted_score(score, category, subcategory)
