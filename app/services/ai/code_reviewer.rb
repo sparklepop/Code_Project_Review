@@ -2056,64 +2056,51 @@ module Ai
     def analyze_react_patterns(path, content, metrics, issues, good_examples)
       # Check for proper component structure
       if content.match?(/(?:export\s+default\s+function|class\s+\w+\s+extends\s+(?:React\.)?Component)/)
-        metrics[:react][:patterns][:followed] << {
-          file: path,
-          pattern: "component_structure",
-          description: "Proper component declaration"
-        }
-      end
-      
-      # Check for prop types usage
-      if path.end_with?('.tsx')
-        if content.match?(/(?:interface|type)\s+\w+Props/)
-          metrics[:react][:patterns][:followed] << {
+        # Check for performance optimizations
+        if content.match?(/React\.memo|useMemo|useCallback/)
+          good_examples << {
             file: path,
-            pattern: "typescript_props",
-            description: "Proper TypeScript props definition"
+            note: "Good use of React performance optimizations"
           }
-        else
-          metrics[:react][:patterns][:violated] << {
+        elsif content.match?(/(?:map|filter|reduce).*(?:map|filter|reduce)/)
+          issues << {
             file: path,
-            pattern: "missing_prop_types",
-            description: "Missing TypeScript props interface"
+            issue: "Consider using memoization for complex computations"
           }
         end
-      end
-      
-      # Check for hooks usage
-      hooks_used = content.scan(/use[A-Z]\w+/).uniq
-      hooks_used.each do |hook|
-        metrics[:react][:features][:used].add(hook)
-      end
-      
-      # Check for proper useEffect dependencies
-      if content.match?(/useEffect\([^,]+,\s*\[\]/)
-        metrics[:react][:patterns][:violated] << {
+
+        # Check for prop types
+        if content.match?(/PropTypes\./)
+          good_examples << {
+            file: path,
+            note: "Good use of PropTypes for type checking"
+          }
+        else
+          issues << {
+            file: path,
+            issue: "Consider adding PropTypes for better type safety"
+          }
+        end
+
+        # Check for hooks usage
+        if content.match?(/use[A-Z]/)
+          metrics[:react_patterns][:hooks_usage] += 1
+        end
+
+        # Check for component organization
+        if content.match?(/const\s+\w+\s*=\s*styled\./)
+          good_examples << {
+            file: path,
+            note: "Good separation of styled components"
+          }
+        end
+      else
+        issues << {
           file: path,
-          pattern: "empty_effect_deps",
-          description: "useEffect with empty dependency array"
+          issue: "Component structure doesn't follow React conventions"
         }
       end
-      
-      # Check for performance optimizations
-      if content.match?(/React\.memo|useMemo|useCallback/)
-        metrics[:react][:features][:used].add('performance_optimizations')
-      else if content.match?(/(?:map|filter|reduce).*(?:map|filter|reduce)/)
-        metrics[:react][:performance][:issues] << {
-          file: path,
-          issue: "Multiple array operations without memoization"
-        }
-      end
-      
-      # Check for proper event handling
-      if content.match?(/on\w+\s*=\s*{[^}]*\.\s*bind\(this\)}/)
-        metrics[:react][:patterns][:violated] << {
-          file: path,
-          pattern: "bind_in_render",
-          description: "Method binding in render"
-        }
-      end
-    end
+    end  # End of analyze_react_patterns
 
     def generate_framework_feedback(issues, good_examples, metrics)
       feedback = []
@@ -2315,6 +2302,10 @@ module Ai
       # Detect test framework
       framework = detect_test_framework(path, content)
       
+      # Track test directory
+      metrics[:organization][:test_directories].add(File.dirname(path))
+      
+      # Analyze based on framework
       case framework
       when :rspec
         analyze_rspec_tests(path, content, metrics, issues, good_examples)
@@ -2324,27 +2315,29 @@ module Ai
         analyze_jest_tests(path, content, metrics, issues, good_examples)
       end
       
-      # Track test organization
-      metrics[:organization][:test_directories].add(File.dirname(path))
-      
-      # Check for test helpers and shared examples
-      if content.match?(/\b(shared_examples|shared_context|before|after|around)\b/)
+      # Check for test helpers
+      if content.match?(/\b(before|after)(_each|_all)?\b|\blet\b|\bsubject\b|\bshared_examples\b/)
         metrics[:organization][:helper_modules] += 1
       end
       
-      if content.match?(/\b(shared_examples|shared_context)\b/)
+      # Check for shared examples
+      if content.match?(/\bshared_examples\b|\bshared_context\b|\bit_behaves_like\b/)
         metrics[:organization][:shared_examples] += 1
       end
-    end
+      
+      # Check for consistent structure
+      metrics[:organization][:consistent_structure] = content.match?(/\b(describe|context)\b.*do\b/)
+    end  # Add missing end for analyze_test_file
 
     def detect_test_framework(path, content)
       if path.include?('spec/') || content.include?('RSpec')
         :rspec
-      elsif path.include?('test/') || content.include?('Minitest')
+      elsif path.include?('test/') && content.include?('Minitest')
         :minitest
-      elsif content.include?('describe') && content.include?('it') && 
-            (path.end_with?('.test.js') || path.end_with?('.spec.js'))
+      elsif content.match?(/\b(describe|it|test)\s*\(/)
         :jest
+      else
+        nil
       end
     end
 
@@ -2373,7 +2366,7 @@ module Ai
           note: "Good use of shared examples for test organization"
         }
       end
-    end
+    end  # Add missing end for analyze_rspec_tests
 
     def analyze_minitest_tests(path, content, metrics, issues, good_examples)
       # Count tests and assertions
@@ -2392,7 +2385,7 @@ module Ai
           note: "Good use of Minitest lifecycle hooks"
         }
       end
-    end
+    end  # Add missing end for analyze_minitest_tests
 
     def analyze_jest_tests(path, content, metrics, issues, good_examples)
       # Count tests and assertions
@@ -2477,22 +2470,21 @@ module Ai
     def calculate_test_organization_score(metrics)
       score = 10.0
       
-      # Check test directory structure
-      if metrics[:organization][:test_directories].size < 2
-        score -= 2 # Basic test organization
-      end
-      
-      # Check for test helpers and shared examples
+      # Deduct points for lack of organization
       if metrics[:organization][:helper_modules] == 0
-        score -= 3 # No test helpers or setup
+        score -= 2
       end
       
       if metrics[:organization][:shared_examples] == 0
-        score -= 2 # No shared examples or contexts
+        score -= 2
+      end
+      
+      if metrics[:organization][:consistent_structure] == false
+        score -= 2
       end
       
       score.clamp(0, 10)
-    end
+    end  # Add missing end for calculate_test_organization_score
 
     def generate_testing_feedback(metrics, issues, good_examples)
       feedback = []
@@ -2516,7 +2508,7 @@ module Ai
             "Good test coverage with room for improvement."
           else
             "Consider adding more tests to cover core functionality."
-        end
+        end  # Add missing end for case statement
       end
       
       # Organization assessment
@@ -2545,23 +2537,25 @@ module Ai
       end
       
       feedback.join("\n")
-    end
+    end  # Add missing end for generate_testing_feedback
 
     def calculate_weighted_score(score, category, subcategory)
       max_score = case category
-      when :code_clarity
-        CLARITY_WEIGHTS[subcategory]
-      when :architecture
-        ARCHITECTURE_WEIGHTS[subcategory]
-      when :practices
-        PRACTICES_WEIGHTS[subcategory]
-      when :problem_solving
-        PROBLEM_SOLVING_WEIGHTS[subcategory]
-      when :bonus
-        BONUS_WEIGHTS[subcategory]
-      end
+        when :code_clarity
+          CLARITY_WEIGHTS[subcategory]
+        when :architecture
+          ARCHITECTURE_WEIGHTS[subcategory]
+        when :practices
+          PRACTICES_WEIGHTS[subcategory]
+        when :problem_solving
+          PROBLEM_SOLVING_WEIGHTS[subcategory]
+        when :bonus
+          BONUS_WEIGHTS[subcategory]
+        else
+          0
+      end  # Add missing end for case statement
 
       (score.to_f / 10 * max_score).round(1)
-    end
-  end
-end 
+    end  # End of calculate_weighted_score
+  end  # End of CodeReviewer class
+end  # End of Ai module
