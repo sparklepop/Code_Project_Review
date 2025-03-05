@@ -715,23 +715,34 @@ module Ai
     def generate_naming_feedback(issues, good_examples)
       feedback = []
       
-      # Add good examples if available
+      # Add good examples if available (limited to 3)
       if good_examples&.any?
-        feedback << "Good naming practices found in the following files:"
-        good_examples.each do |example|
+        feedback << "Good naming practices found:"
+        good_examples.take(3).each do |example|
           feedback << "- #{example[:file]}: #{example[:name]} (#{example[:type]})"
         end
       end
       
-      # Add issues if available
+      # Add issues if available (limited to 3)
       if issues&.any?
         feedback << "\nNaming issues found:"
-        issues.each do |issue|
+        # Prioritize error messages first
+        error_issues = issues.select { |i| i[:type] == 'error' }
+        naming_issues = issues.reject { |i| i[:type] == 'error' }
+        
+        # Show errors first (if any), then regular issues, total limited to 3
+        (error_issues + naming_issues).take(3).each do |issue|
           if issue[:type] == 'error'
             feedback << "- #{issue[:message]}"
           else
             feedback << "- #{issue[:file]}: #{issue[:name]} (#{issue[:type]}) - Suggested: #{issue[:suggestion]}"
           end
+        end
+        
+        # If there are more issues, indicate the total count
+        remaining_issues = issues.size - 3
+        if remaining_issues > 0
+          feedback << "\nAnd #{remaining_issues} more naming issues..."
         end
       end
       
