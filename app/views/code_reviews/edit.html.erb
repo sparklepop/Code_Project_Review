@@ -1,8 +1,110 @@
+<%# Add custom styles %>
+<style>
+  .section-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+  }
+
+  .section-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  .section-header {
+    background: linear-gradient(145deg, #2563eb, #1d4ed8);
+    color: white;
+    border-radius: 15px 15px 0 0;
+    padding: 1rem;
+  }
+
+  .action-button {
+    transition: all 0.2s ease;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .action-button:hover {
+    transform: translateY(-1px);
+  }
+
+  .action-button.primary {
+    background-color: #2563eb;
+    color: white;
+  }
+
+  .action-button.secondary {
+    background-color: #6b7280;
+    color: white;
+  }
+
+  .form-control {
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    padding: 0.75rem;
+    transition: all 0.2s ease;
+  }
+
+  .form-control:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+  }
+
+  .score-input {
+    width: 80px;
+    text-align: center;
+    font-weight: 500;
+  }
+
+  .feedback-input {
+    border-left: 3px solid #2563eb;
+    background-color: #f8fafc;
+  }
+
+  .score-row {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+  }
+
+  .score-row:hover {
+    background-color: #f3f4f6;
+  }
+
+  .max-score {
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin-left: 0.5rem;
+  }
+
+  .form-label {
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-check-label {
+    font-weight: 500;
+    color: #374151;
+  }
+
+  .form-check-input:checked {
+    background-color: #2563eb;
+    border-color: #2563eb;
+  }
+</style>
+
 <div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Edit Code Review</h1>
+    <h1 class="display-4">Edit Code Review</h1>
     <div>
-      <%= link_to 'Back', code_review_path(@code_review), class: 'btn btn-secondary' %>
+      <%= link_to 'Back', code_review_path(@code_review), class: 'action-button secondary' %>
     </div>
   </div>
 
@@ -18,9 +120,9 @@
       </div>
     <% end %>
 
-    <div class="card mb-4">
-      <div class="card-header">
-        <h2>Basic Information</h2>
+    <div class="section-card">
+      <div class="section-header">
+        <h2 class="h4 mb-0">Basic Information</h2>
       </div>
       <div class="card-body">
         <div class="field mb-3">
@@ -46,361 +148,369 @@
     </div>
 
     <!-- Code Clarity -->
-    <div class="card mb-4">
-      <div class="card-header">
-        <h2>Code Clarity (<%= @code_review.clarity_scores["total_score"] %> / 35)</h2>
+    <div class="section-card">
+      <div class="section-header">
+        <h2 class="h4 mb-0">Code Clarity (<%= @code_review.clarity_scores["total_score"] %> / 35)</h2>
       </div>
       <div class="card-body">
-        <div class="row align-items-center mb-2">
-          <div class="col-md-3">Method Simplicity:</div>
-          <div class="col-md-2">
-            <%= f.number_field "clarity_scores[method_simplicity][weighted_score]", 
-                class: "form-control score-input", 
-                min: 0, 
-                max: 10,
-                step: 0.1,
-                value: @code_review.clarity_scores.dig("method_simplicity", "weighted_score") %>
+        <div class="score-row">
+          <div class="row align-items-center mb-2">
+            <div class="col-md-3">Method Simplicity:</div>
+            <div class="col-md-2">
+              <%= f.number_field "clarity_scores[method_simplicity][weighted_score]", 
+                  class: "form-control score-input", 
+                  min: 0, 
+                  max: 10,
+                  step: 0.1,
+                  value: @code_review.clarity_scores.dig("method_simplicity", "weighted_score") %>
+            </div>
+            <div class="col-md-2 max-score">(max: 10)</div>
           </div>
-          <div class="col-md-2 text-muted">(max: 10)</div>
-        </div>
 
-        <div class="px-4">
           <%= f.text_area "clarity_scores[method_simplicity][feedback]", 
-              class: "form-control mb-4 w-100",
+              class: "form-control feedback-input",
               placeholder: "Enter feedback for Method Simplicity...",
               rows: 3,
               value: @code_review.clarity_scores.dig("method_simplicity", "feedback") %>
         </div>
 
-        <hr class="my-4">
-        
-        <div class="row align-items-center mb-2">
-          <div class="col-md-3">Naming Conventions:</div>
-          <div class="col-md-2">
-            <%= f.number_field "clarity_scores[naming_conventions][weighted_score]", 
-                class: "form-control", 
-                min: 0, 
-                max: 10,
-                value: @code_review.clarity_scores.dig("naming_conventions", "weighted_score") %>
+        <div class="score-row">
+          <div class="row align-items-center mb-2">
+            <div class="col-md-3">Naming Conventions:</div>
+            <div class="col-md-2">
+              <%= f.number_field "clarity_scores[naming_conventions][weighted_score]", 
+                  class: "form-control score-input", 
+                  min: 0, 
+                  max: 10,
+                  value: @code_review.clarity_scores.dig("naming_conventions", "weighted_score") %>
+            </div>
+            <div class="col-md-2 max-score">(max: 10)</div>
           </div>
-          <div class="col-md-2 text-muted">(max: 10)</div>
+
+          <%= f.text_area "clarity_scores[naming_conventions][feedback]", 
+              class: "form-control feedback-input",
+              placeholder: "Enter feedback for Naming Conventions...",
+              rows: 3,
+              value: @code_review.clarity_scores.dig("naming_conventions", "feedback") %>
         </div>
 
-        <%= f.text_area "clarity_scores[naming_conventions][feedback]", 
-            class: "form-control form-control-lg mb-4",
-            placeholder: "Enter feedback for Naming Conventions...",
-            rows: 3,
-            value: @code_review.clarity_scores.dig("naming_conventions", "feedback") %>
-
-        <hr class="my-4">
-        
-        <div class="row align-items-center mb-2">
-          <div class="col-md-3">Code Organization:</div>
-          <div class="col-md-2">
-            <%= f.number_field "clarity_scores[code_organization][weighted_score]", 
-                class: "form-control", 
-                min: 0, 
-                max: 10,
-                value: @code_review.clarity_scores.dig("code_organization", "weighted_score") %>
+        <div class="score-row">
+          <div class="row align-items-center mb-2">
+            <div class="col-md-3">Code Organization:</div>
+            <div class="col-md-2">
+              <%= f.number_field "clarity_scores[code_organization][weighted_score]", 
+                  class: "form-control score-input", 
+                  min: 0, 
+                  max: 10,
+                  value: @code_review.clarity_scores.dig("code_organization", "weighted_score") %>
+            </div>
+            <div class="col-md-2 max-score">(max: 10)</div>
           </div>
-          <div class="col-md-2 text-muted">(max: 10)</div>
+
+          <%= f.text_area "clarity_scores[code_organization][feedback]", 
+              class: "form-control feedback-input",
+              placeholder: "Enter feedback for Code Organization...",
+              rows: 3,
+              value: @code_review.clarity_scores.dig("code_organization", "feedback") %>
         </div>
 
-        <%= f.text_area "clarity_scores[code_organization][feedback]", 
-            class: "form-control form-control-lg mb-4",
-            placeholder: "Enter feedback for Code Organization...",
-            rows: 3,
-            value: @code_review.clarity_scores.dig("code_organization", "feedback") %>
-
-        <hr class="my-4">
-        
-        <div class="row align-items-center mb-2">
-          <div class="col-md-3">Comments Quality:</div>
-          <div class="col-md-2">
-            <%= f.number_field "clarity_scores[comments_quality][weighted_score]", 
-                class: "form-control", 
-                min: 0, 
-                max: 5,
-                value: @code_review.clarity_scores.dig("comments_quality", "weighted_score") %>
+        <div class="score-row">
+          <div class="row align-items-center mb-2">
+            <div class="col-md-3">Comments Quality:</div>
+            <div class="col-md-2">
+              <%= f.number_field "clarity_scores[comments_quality][weighted_score]", 
+                  class: "form-control score-input", 
+                  min: 0, 
+                  max: 5,
+                  value: @code_review.clarity_scores.dig("comments_quality", "weighted_score") %>
+            </div>
+            <div class="col-md-2 max-score">(max: 5)</div>
           </div>
-          <div class="col-md-2 text-muted">(max: 5)</div>
-        </div>
 
-        <%= f.text_area "clarity_scores[comments_quality][feedback]", 
-            class: "form-control form-control-lg mb-4",
-            placeholder: "Enter feedback for Comments Quality...",
-            rows: 3,
-            value: @code_review.clarity_scores.dig("comments_quality", "feedback") %>
+          <%= f.text_area "clarity_scores[comments_quality][feedback]", 
+              class: "form-control feedback-input",
+              placeholder: "Enter feedback for Comments Quality...",
+              rows: 3,
+              value: @code_review.clarity_scores.dig("comments_quality", "feedback") %>
+        </div>
       </div>
     </div>
 
     <!-- Architecture -->
-    <div class="card mb-4">
-      <div class="card-header">
-        <h2>Architecture (<%= @code_review.architecture_scores["total_score"] %> / 25)</h2>
+    <div class="section-card">
+      <div class="section-header">
+        <h2 class="h4 mb-0">Architecture (<%= @code_review.architecture_scores["total_score"] %> / 25)</h2>
       </div>
       <div class="card-body">
-        <div class="row align-items-center mb-2">
-          <div class="col-md-3">Separation of Concerns:</div>
-          <div class="col-md-2">
-            <%= f.number_field "architecture_scores[separation_of_concerns][weighted_score]", 
-                class: "form-control", 
-                min: 0, 
-                max: 10,
-                value: @code_review.architecture_scores.dig("separation_of_concerns", "weighted_score") %>
+        <div class="score-row">
+          <div class="row align-items-center mb-2">
+            <div class="col-md-3">Separation of Concerns:</div>
+            <div class="col-md-2">
+              <%= f.number_field "architecture_scores[separation_of_concerns][weighted_score]", 
+                  class: "form-control score-input", 
+                  min: 0, 
+                  max: 10,
+                  value: @code_review.architecture_scores.dig("separation_of_concerns", "weighted_score") %>
+            </div>
+            <div class="col-md-2 max-score">(max: 10)</div>
           </div>
-          <div class="col-md-2 text-muted">(max: 10)</div>
+
+          <%= f.text_area "architecture_scores[separation_of_concerns][feedback]", 
+              class: "form-control feedback-input", 
+              placeholder: "Enter feedback for Separation of Concerns...",
+              rows: 3,
+              value: @code_review.architecture_scores.dig("separation_of_concerns", "feedback") %>
         </div>
 
-        <%= f.text_area "architecture_scores[separation_of_concerns][feedback]", 
-            class: "form-control form-control-lg mb-4", 
-            placeholder: "Enter feedback for Separation of Concerns...",
-            rows: 3,
-            value: @code_review.architecture_scores.dig("separation_of_concerns", "feedback") %>
-
-        <hr class="my-4">
-        
-        <div class="row align-items-center mb-2">
-          <div class="col-md-3">File Organization:</div>
-          <div class="col-md-2">
-            <%= f.number_field "architecture_scores[file_organization][weighted_score]", 
-                class: "form-control", 
-                min: 0, 
-                max: 5,
-                value: @code_review.architecture_scores.dig("file_organization", "weighted_score") %>
+        <div class="score-row">
+          <div class="row align-items-center mb-2">
+            <div class="col-md-3">File Organization:</div>
+            <div class="col-md-2">
+              <%= f.number_field "architecture_scores[file_organization][weighted_score]", 
+                  class: "form-control score-input", 
+                  min: 0, 
+                  max: 5,
+                  value: @code_review.architecture_scores.dig("file_organization", "weighted_score") %>
+            </div>
+            <div class="col-md-2 max-score">(max: 5)</div>
           </div>
-          <div class="col-md-2 text-muted">(max: 5)</div>
+
+          <%= f.text_area "architecture_scores[file_organization][feedback]", 
+              class: "form-control feedback-input", 
+              placeholder: "Enter feedback for File Organization...",
+              rows: 3,
+              value: @code_review.architecture_scores.dig("file_organization", "feedback") %>
         </div>
 
-        <%= f.text_area "architecture_scores[file_organization][feedback]", 
-            class: "form-control form-control-lg mb-4", 
-            placeholder: "Enter feedback for File Organization...",
-            rows: 3,
-            value: @code_review.architecture_scores.dig("file_organization", "feedback") %>
-
-        <hr class="my-4">
-        
-        <div class="row align-items-center mb-2">
-          <div class="col-md-3">Dependency Management:</div>
-          <div class="col-md-2">
-            <%= f.number_field "architecture_scores[dependency_management][weighted_score]", 
-                class: "form-control", 
-                min: 0, 
-                max: 5,
-                value: @code_review.architecture_scores.dig("dependency_management", "weighted_score") %>
+        <div class="score-row">
+          <div class="row align-items-center mb-2">
+            <div class="col-md-3">Dependency Management:</div>
+            <div class="col-md-2">
+              <%= f.number_field "architecture_scores[dependency_management][weighted_score]", 
+                  class: "form-control score-input", 
+                  min: 0, 
+                  max: 5,
+                  value: @code_review.architecture_scores.dig("dependency_management", "weighted_score") %>
+            </div>
+            <div class="col-md-2 max-score">(max: 5)</div>
           </div>
-          <div class="col-md-2 text-muted">(max: 5)</div>
+
+          <%= f.text_area "architecture_scores[dependency_management][feedback]", 
+              class: "form-control feedback-input", 
+              placeholder: "Enter feedback for Dependency Management...",
+              rows: 3,
+              value: @code_review.architecture_scores.dig("dependency_management", "feedback") %>
         </div>
 
-        <%= f.text_area "architecture_scores[dependency_management][feedback]", 
-            class: "form-control form-control-lg mb-4", 
-            placeholder: "Enter feedback for Dependency Management...",
-            rows: 3,
-            value: @code_review.architecture_scores.dig("dependency_management", "feedback") %>
-
-        <hr class="my-4">
-        
-        <div class="row align-items-center mb-2">
-          <div class="col-md-3">Framework Usage:</div>
-          <div class="col-md-2">
-            <%= f.number_field "architecture_scores[framework_usage][weighted_score]", 
-                class: "form-control", 
-                min: 0, 
-                max: 5,
-                value: @code_review.architecture_scores.dig("framework_usage", "weighted_score") %>
+        <div class="score-row">
+          <div class="row align-items-center mb-2">
+            <div class="col-md-3">Framework Usage:</div>
+            <div class="col-md-2">
+              <%= f.number_field "architecture_scores[framework_usage][weighted_score]", 
+                  class: "form-control score-input", 
+                  min: 0, 
+                  max: 5,
+                  value: @code_review.architecture_scores.dig("framework_usage", "weighted_score") %>
+            </div>
+            <div class="col-md-2 max-score">(max: 5)</div>
           </div>
-          <div class="col-md-2 text-muted">(max: 5)</div>
-        </div>
 
-        <%= f.text_area "architecture_scores[framework_usage][feedback]", 
-            class: "form-control form-control-lg mb-4", 
-            placeholder: "Enter feedback for Framework Usage...",
-            rows: 3,
-            value: @code_review.architecture_scores.dig("framework_usage", "feedback") %>
+          <%= f.text_area "architecture_scores[framework_usage][feedback]", 
+              class: "form-control feedback-input", 
+              placeholder: "Enter feedback for Framework Usage...",
+              rows: 3,
+              value: @code_review.architecture_scores.dig("framework_usage", "feedback") %>
+        </div>
       </div>
     </div>
 
     <!-- Documentation -->
-    <div class="card mb-4">
-      <div class="card-header">
-        <h2>Documentation (<%= @code_review.practices_scores["total_score"] %> / 25)</h2>
+    <div class="section-card">
+      <div class="section-header">
+        <h2 class="h4 mb-0">Documentation (<%= @code_review.practices_scores["total_score"] %> / 25)</h2>
       </div>
       <div class="card-body">
-        <div class="row align-items-center mb-2">
-          <div class="col-md-3">Commit Quality:</div>
-          <div class="col-md-2">
-            <%= f.number_field "practices_scores[commit_quality][weighted_score]", 
-                class: "form-control", 
-                min: 0, 
-                max: 10,
-                value: @code_review.practices_scores.dig("commit_quality", "weighted_score") %>
+        <div class="score-row">
+          <div class="row align-items-center mb-2">
+            <div class="col-md-3">Commit Quality:</div>
+            <div class="col-md-2">
+              <%= f.number_field "practices_scores[commit_quality][weighted_score]", 
+                  class: "form-control score-input", 
+                  min: 0, 
+                  max: 10,
+                  value: @code_review.practices_scores.dig("commit_quality", "weighted_score") %>
+            </div>
+            <div class="col-md-2 max-score">(max: 10)</div>
           </div>
-          <div class="col-md-2 text-muted">(max: 10)</div>
+
+          <%= f.text_area "practices_scores[commit_quality][feedback]", 
+              class: "form-control feedback-input", 
+              placeholder: "Enter feedback for Commit Quality...",
+              rows: 3,
+              value: @code_review.practices_scores.dig("commit_quality", "feedback") %>
         </div>
 
-        <%= f.text_area "practices_scores[commit_quality][feedback]", 
-            class: "form-control form-control-lg mb-4", 
-            placeholder: "Enter feedback for Commit Quality...",
-            rows: 3,
-            value: @code_review.practices_scores.dig("commit_quality", "feedback") %>
-
-        <hr class="my-4">
-        
-        <div class="row align-items-center mb-2">
-          <div class="col-md-3">Basic Testing:</div>
-          <div class="col-md-2">
-            <%= f.number_field "practices_scores[basic_testing][weighted_score]", 
-                class: "form-control", 
-                min: 0, 
-                max: 10,
-                value: @code_review.practices_scores.dig("basic_testing", "weighted_score") %>
+        <div class="score-row">
+          <div class="row align-items-center mb-2">
+            <div class="col-md-3">Basic Testing:</div>
+            <div class="col-md-2">
+              <%= f.number_field "practices_scores[basic_testing][weighted_score]", 
+                  class: "form-control score-input", 
+                  min: 0, 
+                  max: 10,
+                  value: @code_review.practices_scores.dig("basic_testing", "weighted_score") %>
+            </div>
+            <div class="col-md-2 max-score">(max: 10)</div>
           </div>
-          <div class="col-md-2 text-muted">(max: 10)</div>
+
+          <%= f.text_area "practices_scores[basic_testing][feedback]", 
+              class: "form-control feedback-input", 
+              placeholder: "Enter feedback for Basic Testing...",
+              rows: 3,
+              value: @code_review.practices_scores.dig("basic_testing", "feedback") %>
         </div>
 
-        <%= f.text_area "practices_scores[basic_testing][feedback]", 
-            class: "form-control form-control-lg mb-4", 
-            placeholder: "Enter feedback for Basic Testing...",
-            rows: 3,
-            value: @code_review.practices_scores.dig("basic_testing", "feedback") %>
-
-        <hr class="my-4">
-        
-        <div class="row align-items-center mb-2">
-          <div class="col-md-3">Documentation:</div>
-          <div class="col-md-2">
-            <%= f.number_field "practices_scores[documentation][weighted_score]", 
-                class: "form-control", 
-                min: 0, 
-                max: 5,
-                value: @code_review.practices_scores.dig("documentation", "weighted_score") %>
+        <div class="score-row">
+          <div class="row align-items-center mb-2">
+            <div class="col-md-3">Documentation:</div>
+            <div class="col-md-2">
+              <%= f.number_field "practices_scores[documentation][weighted_score]", 
+                  class: "form-control score-input", 
+                  min: 0, 
+                  max: 5,
+                  value: @code_review.practices_scores.dig("documentation", "weighted_score") %>
+            </div>
+            <div class="col-md-2 max-score">(max: 5)</div>
           </div>
-          <div class="col-md-2 text-muted">(max: 5)</div>
-        </div>
 
-        <%= f.text_area "practices_scores[documentation][feedback]", 
-            class: "form-control form-control-lg mb-4", 
-            placeholder: "Enter feedback for Documentation...",
-            rows: 3,
-            value: @code_review.practices_scores.dig("documentation", "feedback") %>
+          <%= f.text_area "practices_scores[documentation][feedback]", 
+              class: "form-control feedback-input", 
+              placeholder: "Enter feedback for Documentation...",
+              rows: 3,
+              value: @code_review.practices_scores.dig("documentation", "feedback") %>
+        </div>
       </div>
     </div>
 
     <!-- Problem Solving -->
-    <div class="card mb-4">
-      <div class="card-header">
-        <h2>Problem Solving (<%= @code_review.problem_solving_scores["total_score"] %> / 15)</h2>
+    <div class="section-card">
+      <div class="section-header">
+        <h2 class="h4 mb-0">Problem Solving (<%= @code_review.problem_solving_scores["total_score"] %> / 15)</h2>
       </div>
       <div class="card-body">
-        <div class="row align-items-center mb-2">
-          <div class="col-md-3">Solution Simplicity:</div>
-          <div class="col-md-2">
-            <%= f.number_field "problem_solving_scores[solution_simplicity][weighted_score]", 
-                class: "form-control", 
-                min: 0, 
-                max: 10,
-                value: @code_review.problem_solving_scores.dig("solution_simplicity", "weighted_score") %>
+        <div class="score-row">
+          <div class="row align-items-center mb-2">
+            <div class="col-md-3">Solution Simplicity:</div>
+            <div class="col-md-2">
+              <%= f.number_field "problem_solving_scores[solution_simplicity][weighted_score]", 
+                  class: "form-control score-input", 
+                  min: 0, 
+                  max: 10,
+                  value: @code_review.problem_solving_scores.dig("solution_simplicity", "weighted_score") %>
+            </div>
+            <div class="col-md-2 max-score">(max: 10)</div>
           </div>
-          <div class="col-md-2 text-muted">(max: 10)</div>
+
+          <%= f.text_area "problem_solving_scores[solution_simplicity][feedback]", 
+              class: "form-control feedback-input", 
+              placeholder: "Enter feedback for Solution Simplicity...",
+              rows: 3,
+              value: @code_review.problem_solving_scores.dig("solution_simplicity", "feedback") %>
         </div>
 
-        <%= f.text_area "problem_solving_scores[solution_simplicity][feedback]", 
-            class: "form-control form-control-lg mb-4", 
-            placeholder: "Enter feedback for Solution Simplicity...",
-            rows: 3,
-            value: @code_review.problem_solving_scores.dig("solution_simplicity", "feedback") %>
-
-        <hr class="my-4">
-        
-        <div class="row align-items-center mb-2">
-          <div class="col-md-3">Code Reuse:</div>
-          <div class="col-md-2">
-            <%= f.number_field "problem_solving_scores[code_reuse][weighted_score]", 
-                class: "form-control", 
-                min: 0, 
-                max: 5,
-                value: @code_review.problem_solving_scores.dig("code_reuse", "weighted_score") %>
+        <div class="score-row">
+          <div class="row align-items-center mb-2">
+            <div class="col-md-3">Code Reuse:</div>
+            <div class="col-md-2">
+              <%= f.number_field "problem_solving_scores[code_reuse][weighted_score]", 
+                  class: "form-control score-input", 
+                  min: 0, 
+                  max: 5,
+                  value: @code_review.problem_solving_scores.dig("code_reuse", "weighted_score") %>
+            </div>
+            <div class="col-md-2 max-score">(max: 5)</div>
           </div>
-          <div class="col-md-2 text-muted">(max: 5)</div>
-        </div>
 
-        <%= f.text_area "problem_solving_scores[code_reuse][feedback]", 
-            class: "form-control form-control-lg mb-4", 
-            placeholder: "Enter feedback for Code Reuse...",
-            rows: 3,
-            value: @code_review.problem_solving_scores.dig("code_reuse", "feedback") %>
+          <%= f.text_area "problem_solving_scores[code_reuse][feedback]", 
+              class: "form-control feedback-input", 
+              placeholder: "Enter feedback for Code Reuse...",
+              rows: 3,
+              value: @code_review.problem_solving_scores.dig("code_reuse", "feedback") %>
+        </div>
       </div>
     </div>
 
     <!-- Bonus Points -->
-    <div class="card mb-4">
-      <div class="card-header">
-        <h2>Bonus Points (<%= @code_review.bonus_scores["total_score"] %> / 15)</h2>
+    <div class="section-card">
+      <div class="section-header">
+        <h2 class="h4 mb-0">Bonus Points (<%= @code_review.bonus_scores["total_score"] %> / 15)</h2>
       </div>
       <div class="card-body">
-        <div class="row align-items-center mb-2">
-          <div class="col-md-3">Basic Testing:</div>
-          <div class="col-md-2">
-            <%= f.number_field "bonus_scores[basic_testing][weighted_score]", 
-                class: "form-control", 
-                min: 0, 
-                max: 8,
-                value: @code_review.bonus_scores.dig("basic_testing", "weighted_score") %>
+        <div class="score-row">
+          <div class="row align-items-center mb-2">
+            <div class="col-md-3">Basic Testing:</div>
+            <div class="col-md-2">
+              <%= f.number_field "bonus_scores[basic_testing][weighted_score]", 
+                  class: "form-control score-input", 
+                  min: 0, 
+                  max: 8,
+                  value: @code_review.bonus_scores.dig("basic_testing", "weighted_score") %>
+            </div>
+            <div class="col-md-2 max-score">(max: 8)</div>
           </div>
-          <div class="col-md-2 text-muted">(max: 8)</div>
+
+          <%= f.text_area "bonus_scores[basic_testing][feedback]", 
+              class: "form-control feedback-input", 
+              placeholder: "Enter feedback for Basic Testing...",
+              rows: 3,
+              value: @code_review.bonus_scores.dig("basic_testing", "feedback") %>
         </div>
 
-        <%= f.text_area "bonus_scores[basic_testing][feedback]", 
-            class: "form-control form-control-lg mb-4", 
-            placeholder: "Enter feedback for Basic Testing...",
-            rows: 3,
-            value: @code_review.bonus_scores.dig("basic_testing", "feedback") %>
-
-        <hr class="my-4">
-        
-        <div class="row align-items-center mb-2">
-          <div class="col-md-3">Test Coverage:</div>
-          <div class="col-md-2">
-            <%= f.number_field "bonus_scores[test_coverage][weighted_score]", 
-                class: "form-control", 
-                min: 0, 
-                max: 4,
-                value: @code_review.bonus_scores.dig("test_coverage", "weighted_score") %>
+        <div class="score-row">
+          <div class="row align-items-center mb-2">
+            <div class="col-md-3">Test Coverage:</div>
+            <div class="col-md-2">
+              <%= f.number_field "bonus_scores[test_coverage][weighted_score]", 
+                  class: "form-control score-input", 
+                  min: 0, 
+                  max: 4,
+                  value: @code_review.bonus_scores.dig("test_coverage", "weighted_score") %>
+            </div>
+            <div class="col-md-2 max-score">(max: 4)</div>
           </div>
-          <div class="col-md-2 text-muted">(max: 4)</div>
+
+          <%= f.text_area "bonus_scores[test_coverage][feedback]", 
+              class: "form-control feedback-input", 
+              placeholder: "Enter feedback for Test Coverage...",
+              rows: 3,
+              value: @code_review.bonus_scores.dig("test_coverage", "feedback") %>
         </div>
 
-        <%= f.text_area "bonus_scores[test_coverage][feedback]", 
-            class: "form-control form-control-lg mb-4", 
-            placeholder: "Enter feedback for Test Coverage...",
-            rows: 3,
-            value: @code_review.bonus_scores.dig("test_coverage", "feedback") %>
-
-        <hr class="my-4">
-        
-        <div class="row align-items-center mb-2">
-          <div class="col-md-3">Test Organization:</div>
-          <div class="col-md-2">
-            <%= f.number_field "bonus_scores[test_organization][weighted_score]", 
-                class: "form-control", 
-                min: 0, 
-                max: 3,
-                value: @code_review.bonus_scores.dig("test_organization", "weighted_score") %>
+        <div class="score-row">
+          <div class="row align-items-center mb-2">
+            <div class="col-md-3">Test Organization:</div>
+            <div class="col-md-2">
+              <%= f.number_field "bonus_scores[test_organization][weighted_score]", 
+                  class: "form-control score-input", 
+                  min: 0, 
+                  max: 3,
+                  value: @code_review.bonus_scores.dig("test_organization", "weighted_score") %>
+            </div>
+            <div class="col-md-2 max-score">(max: 3)</div>
           </div>
-          <div class="col-md-2 text-muted">(max: 3)</div>
-        </div>
 
-        <%= f.text_area "bonus_scores[test_organization][feedback]", 
-            class: "form-control form-control-lg mb-4", 
-            placeholder: "Enter feedback for Test Organization...",
-            rows: 3,
-            value: @code_review.bonus_scores.dig("test_organization", "feedback") %>
+          <%= f.text_area "bonus_scores[test_organization][feedback]", 
+              class: "form-control feedback-input", 
+              placeholder: "Enter feedback for Test Organization...",
+              rows: 3,
+              value: @code_review.bonus_scores.dig("test_organization", "feedback") %>
+        </div>
       </div>
     </div>
 
-    <div class="card mb-4">
-      <div class="card-header">
-        <h2>Additional Information</h2>
+    <div class="section-card">
+      <div class="section-header">
+        <h2 class="h4 mb-0">Additional Information</h2>
       </div>
       <div class="card-body">
         <div class="field mb-3">
@@ -412,13 +522,13 @@
 
         <div class="field mb-3">
           <%= f.label :overall_comments, "Overall Comments", class: "form-label" %>
-          <%= f.text_area :overall_comments, class: "form-control", rows: 5 %>
+          <%= f.text_area :overall_comments, class: "form-control feedback-input", rows: 5 %>
         </div>
       </div>
     </div>
 
-    <div class="actions">
-      <%= f.submit "Update Code Review", class: "btn btn-primary" %>
+    <div class="actions mb-4">
+      <%= f.submit "Update Code Review", class: "action-button primary" %>
     </div>
   <% end %>
 </div> 

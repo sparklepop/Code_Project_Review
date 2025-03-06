@@ -1,20 +1,142 @@
+<%# Add custom styles %>
+<style>
+  .assessment-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    display: inline-block;
+  }
+  
+  .assessment-outstanding {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .assessment-excellent {
+    background-color: #2196F3;
+    color: white;
+  }
+  
+  .assessment-good {
+    background-color: #FF9800;
+    color: white;
+  }
+  
+  .assessment-fair {
+    background-color: #F44336;
+    color: white;
+  }
+  
+  .score-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #f3f4f6, #ffffff);
+    box-shadow: 5px 5px 10px #d1d1d1, -5px -5px 10px #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 1rem auto;
+  }
+  
+  .score-circle .score {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #2563eb;
+  }
+  
+  .score-circle .total {
+    font-size: 0.9rem;
+    color: #6b7280;
+  }
+
+  .section-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+  }
+
+  .section-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  .section-header {
+    background: linear-gradient(145deg, #2563eb, #1d4ed8);
+    color: white;
+    border-radius: 15px 15px 0 0;
+    padding: 1rem;
+  }
+
+  .score-row {
+    transition: all 0.2s ease;
+    border-radius: 8px;
+    margin: 0.5rem 0;
+    padding: 0.75rem;
+  }
+
+  .score-row:hover {
+    background-color: #f3f4f6;
+  }
+
+  .feedback-text {
+    color: #4b5563;
+    font-style: italic;
+    padding: 0.5rem;
+    border-left: 3px solid #2563eb;
+    margin-left: 1rem;
+  }
+
+  .action-button {
+    transition: all 0.2s ease;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+  }
+
+  .action-button:hover {
+    transform: translateY(-1px);
+  }
+
+  .action-button.primary {
+    background-color: #2563eb;
+    color: white;
+  }
+
+  .action-button.secondary {
+    background-color: #6b7280;
+    color: white;
+  }
+
+  .action-button.danger {
+    background-color: #dc2626;
+    color: white;
+  }
+</style>
+
 <div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Code Review</h1>
+    <h1 class="display-4">Code Review</h1>
     <div class="d-flex gap-2">
-      <%= link_to 'Edit', edit_code_review_path(@code_review), class: 'btn btn-primary' %>
-      <%= link_to 'Back', code_reviews_path, class: 'btn btn-secondary' %>
+      <%= link_to 'Edit', edit_code_review_path(@code_review), class: 'action-button primary' %>
+      <%= link_to 'Back', code_reviews_path, class: 'action-button secondary' %>
     </div>
   </div>
 
-  <div class="card mb-4">
-    <div class="card-header">
-      <h2>Basic Information</h2>
+  <div class="section-card mb-4">
+    <div class="section-header">
+      <h2 class="h4 mb-0">Basic Information</h2>
     </div>
     <div class="card-body">
       <div class="row mb-3">
         <div class="col-md-3"><strong>Repository URL:</strong></div>
-        <div class="col-md-9"><%= link_to @code_review.repository_url, @code_review.repository_url, target: '_blank' %></div>
+        <div class="col-md-9">
+          <%= link_to @code_review.repository_url, @code_review.repository_url, 
+              target: '_blank',
+              class: 'text-decoration-none text-primary' %>
+        </div>
       </div>
       <div class="row mb-3">
         <div class="col-md-3"><strong>Candidate:</strong></div>
@@ -24,62 +146,75 @@
         <div class="col-md-3"><strong>Reviewer:</strong></div>
         <div class="col-md-9"><%= @code_review.reviewer_name %></div>
       </div>
-      <div class="row mb-3">
-        <div class="col-md-3"><strong>Total Score:</strong></div>
-        <div class="col-md-9"><%= @code_review.total_score %> / 115</div>
+      
+      <div class="score-circle">
+        <div class="score"><%= @code_review.total_score %></div>
+        <div class="total">out of 115</div>
       </div>
-      <div class="row mb-3">
-        <div class="col-md-3"><strong>Assessment Level:</strong></div>
-        <div class="col-md-9"><%= @code_review.assessment_level %></div>
+      
+      <div class="text-center mt-3">
+        <span class="assessment-badge <%= "assessment-#{@code_review.assessment_level.downcase.split(' ').first}" %>">
+          <%= @code_review.assessment_level %>
+        </span>
       </div>
     </div>
   </div>
 
-  <div class="card mb-4">
-    <div class="card-header">
-      <h2>Scores Breakdown</h2>
+  <div class="section-card mb-4">
+    <div class="section-header">
+      <h2 class="h4 mb-0">Scores Breakdown</h2>
     </div>
     <div class="card-body">
       <!-- Code Clarity -->
-      <div class="card mb-4">
-        <div class="card-header">
-          <h2>Code Clarity (<%= @code_review.clarity_scores["total_score"] %> / 35)</h2>
+      <div class="section-card mb-4">
+        <div class="section-header">
+          <h2 class="h5 mb-0">Code Clarity (<%= @code_review.clarity_scores["total_score"] %> / 35)</h2>
         </div>
         <div class="card-body">
-          <div class="ms-4 mb-3">
-            <div class="row mb-3">
-              <div class="col-md-2">Method Simplicity:</div>
+          <div class="score-row">
+            <div class="row align-items-center">
+              <div class="col-md-3">Method Simplicity:</div>
               <div class="col-md-2"><%= @code_review.clarity_scores.dig("method_simplicity", "weighted_score") %> / 10</div>
-              <div class="col-md-2">Feedback:</div>
-              <div class="col-md-6 text-secondary">
-                <%= @code_review.clarity_scores.dig("method_simplicity", "feedback") %>
+              <div class="col-md-7">
+                <div class="feedback-text">
+                  <%= @code_review.clarity_scores.dig("method_simplicity", "feedback") %>
+                </div>
               </div>
             </div>
+          </div>
 
-            <div class="row mb-3">
-              <div class="col-md-2">Naming Conventions:</div>
+          <div class="score-row">
+            <div class="row align-items-center">
+              <div class="col-md-3">Naming Conventions:</div>
               <div class="col-md-2"><%= @code_review.clarity_scores.dig("naming_conventions", "weighted_score") %> / 10</div>
-              <div class="col-md-2">Feedback:</div>
-              <div class="col-md-6 text-secondary">
-                <%= @code_review.clarity_scores.dig("naming_conventions", "feedback") %>
+              <div class="col-md-7">
+                <div class="feedback-text">
+                  <%= @code_review.clarity_scores.dig("naming_conventions", "feedback") %>
+                </div>
               </div>
             </div>
+          </div>
 
-            <div class="row mb-3">
-              <div class="col-md-2">Code Organization:</div>
+          <div class="score-row">
+            <div class="row align-items-center">
+              <div class="col-md-3">Code Organization:</div>
               <div class="col-md-2"><%= @code_review.clarity_scores.dig("code_organization", "weighted_score") %> / 10</div>
-              <div class="col-md-2">Feedback:</div>
-              <div class="col-md-6 text-secondary">
-                <%= @code_review.clarity_scores.dig("code_organization", "feedback") %>
+              <div class="col-md-7">
+                <div class="feedback-text">
+                  <%= @code_review.clarity_scores.dig("code_organization", "feedback") %>
+                </div>
               </div>
             </div>
+          </div>
 
-            <div class="row mb-3">
-              <div class="col-md-2">Comments Quality:</div>
+          <div class="score-row">
+            <div class="row align-items-center">
+              <div class="col-md-3">Comments Quality:</div>
               <div class="col-md-2"><%= @code_review.clarity_scores.dig("comments_quality", "weighted_score") %> / 5</div>
-              <div class="col-md-2">Feedback:</div>
-              <div class="col-md-6 text-secondary">
-                <%= @code_review.clarity_scores.dig("comments_quality", "feedback") %>
+              <div class="col-md-7">
+                <div class="feedback-text">
+                  <%= @code_review.clarity_scores.dig("comments_quality", "feedback") %>
+                </div>
               </div>
             </div>
           </div>
@@ -87,36 +222,43 @@
       </div>
 
       <!-- Documentation -->
-      <div class="card mb-4">
-        <div class="card-header">
-          <h2>Documentation (<%= @code_review.practices_scores["total_score"] %> / 25)</h2>
+      <div class="section-card mb-4">
+        <div class="section-header">
+          <h2 class="h5 mb-0">Documentation (<%= @code_review.practices_scores["total_score"] %> / 25)</h2>
         </div>
         <div class="card-body">
-          <div class="ms-4 mb-3">
-            <div class="row mb-3">
-              <div class="col-md-2">Commit Quality:</div>
+          <div class="score-row">
+            <div class="row align-items-center">
+              <div class="col-md-3">Commit Quality:</div>
               <div class="col-md-2"><%= @code_review.practices_scores.dig("commit_quality", "weighted_score") %> / 10</div>
-              <div class="col-md-2">Feedback:</div>
-              <div class="col-md-6 text-secondary">
-                <%= @code_review.practices_scores.dig("commit_quality", "feedback") %>
+              <div class="col-md-7">
+                <div class="feedback-text">
+                  <%= @code_review.practices_scores.dig("commit_quality", "feedback") %>
+                </div>
               </div>
             </div>
+          </div>
 
-            <div class="row mb-3">
-              <div class="col-md-2">Basic Testing:</div>
+          <div class="score-row">
+            <div class="row align-items-center">
+              <div class="col-md-3">Basic Testing:</div>
               <div class="col-md-2"><%= @code_review.practices_scores.dig("basic_testing", "weighted_score") %> / 10</div>
-              <div class="col-md-2">Feedback:</div>
-              <div class="col-md-6 text-secondary">
-                <%= @code_review.practices_scores.dig("basic_testing", "feedback") %>
+              <div class="col-md-7">
+                <div class="feedback-text">
+                  <%= @code_review.practices_scores.dig("basic_testing", "feedback") %>
+                </div>
               </div>
             </div>
+          </div>
 
-            <div class="row mb-3">
-              <div class="col-md-2">Documentation:</div>
+          <div class="score-row">
+            <div class="row align-items-center">
+              <div class="col-md-3">Documentation:</div>
               <div class="col-md-2"><%= @code_review.practices_scores.dig("documentation", "weighted_score") %> / 5</div>
-              <div class="col-md-2">Feedback:</div>
-              <div class="col-md-6 text-secondary">
-                <%= @code_review.practices_scores.dig("documentation", "feedback") %>
+              <div class="col-md-7">
+                <div class="feedback-text">
+                  <%= @code_review.practices_scores.dig("documentation", "feedback") %>
+                </div>
               </div>
             </div>
           </div>
@@ -124,45 +266,55 @@
       </div>
 
       <!-- Architecture -->
-      <div class="card mb-4">
-        <div class="card-header">
-          <h2>Architecture (<%= @code_review.architecture_scores["total_score"] %> / 25)</h2>
+      <div class="section-card mb-4">
+        <div class="section-header">
+          <h2 class="h5 mb-0">Architecture (<%= @code_review.architecture_scores["total_score"] %> / 25)</h2>
         </div>
         <div class="card-body">
-          <div class="ms-4 mb-3">
-            <div class="row mb-3">
-              <div class="col-md-2">Separation of Concerns:</div>
+          <div class="score-row">
+            <div class="row align-items-center">
+              <div class="col-md-3">Separation of Concerns:</div>
               <div class="col-md-2"><%= @code_review.architecture_scores.dig("separation_of_concerns", "weighted_score") %> / 10</div>
-              <div class="col-md-2">Feedback:</div>
-              <div class="col-md-6 text-secondary">
-                <%= @code_review.architecture_scores.dig("separation_of_concerns", "feedback") %>
+              <div class="col-md-7">
+                <div class="feedback-text">
+                  <%= @code_review.architecture_scores.dig("separation_of_concerns", "feedback") %>
+                </div>
               </div>
             </div>
+          </div>
 
-            <div class="row mb-3">
-              <div class="col-md-2">File Organization:</div>
+          <div class="score-row">
+            <div class="row align-items-center">
+              <div class="col-md-3">File Organization:</div>
               <div class="col-md-2"><%= @code_review.architecture_scores.dig("file_organization", "weighted_score") %> / 5</div>
-              <div class="col-md-2">Feedback:</div>
-              <div class="col-md-6 text-secondary">
-                <%= @code_review.architecture_scores.dig("file_organization", "feedback") %>
+              <div class="col-md-7">
+                <div class="feedback-text">
+                  <%= @code_review.architecture_scores.dig("file_organization", "feedback") %>
+                </div>
               </div>
             </div>
+          </div>
 
-            <div class="row mb-3">
-              <div class="col-md-2">Dependency Management:</div>
+          <div class="score-row">
+            <div class="row align-items-center">
+              <div class="col-md-3">Dependency Management:</div>
               <div class="col-md-2"><%= @code_review.architecture_scores.dig("dependency_management", "weighted_score") %> / 5</div>
-              <div class="col-md-2">Feedback:</div>
-              <div class="col-md-6 text-secondary">
-                <%= @code_review.architecture_scores.dig("dependency_management", "feedback") %>
+              <div class="col-md-7">
+                <div class="feedback-text">
+                  <%= @code_review.architecture_scores.dig("dependency_management", "feedback") %>
+                </div>
               </div>
             </div>
+          </div>
 
-            <div class="row mb-3">
-              <div class="col-md-2">Framework Usage:</div>
+          <div class="score-row">
+            <div class="row align-items-center">
+              <div class="col-md-3">Framework Usage:</div>
               <div class="col-md-2"><%= @code_review.architecture_scores.dig("framework_usage", "weighted_score") %> / 5</div>
-              <div class="col-md-2">Feedback:</div>
-              <div class="col-md-6 text-secondary">
-                <%= @code_review.architecture_scores.dig("framework_usage", "feedback") %>
+              <div class="col-md-7">
+                <div class="feedback-text">
+                  <%= @code_review.architecture_scores.dig("framework_usage", "feedback") %>
+                </div>
               </div>
             </div>
           </div>
@@ -170,27 +322,31 @@
       </div>
 
       <!-- Problem Solving -->
-      <div class="card mb-4">
-        <div class="card-header">
-          <h2>Problem Solving (<%= @code_review.problem_solving_scores["total_score"] %> / 15)</h2>
+      <div class="section-card mb-4">
+        <div class="section-header">
+          <h2 class="h5 mb-0">Problem Solving (<%= @code_review.problem_solving_scores["total_score"] %> / 15)</h2>
         </div>
         <div class="card-body">
-          <div class="ms-4 mb-3">
-            <div class="row mb-3">
-              <div class="col-md-2">Solution Simplicity:</div>
+          <div class="score-row">
+            <div class="row align-items-center">
+              <div class="col-md-3">Solution Simplicity:</div>
               <div class="col-md-2"><%= @code_review.problem_solving_scores.dig("solution_simplicity", "weighted_score") %> / 10</div>
-              <div class="col-md-2">Feedback:</div>
-              <div class="col-md-6 text-secondary">
-                <%= @code_review.problem_solving_scores.dig("solution_simplicity", "feedback") %>
+              <div class="col-md-7">
+                <div class="feedback-text">
+                  <%= @code_review.problem_solving_scores.dig("solution_simplicity", "feedback") %>
+                </div>
               </div>
             </div>
+          </div>
 
-            <div class="row mb-3">
-              <div class="col-md-2">Code Reuse:</div>
+          <div class="score-row">
+            <div class="row align-items-center">
+              <div class="col-md-3">Code Reuse:</div>
               <div class="col-md-2"><%= @code_review.problem_solving_scores.dig("code_reuse", "weighted_score") %> / 5</div>
-              <div class="col-md-2">Feedback:</div>
-              <div class="col-md-6 text-secondary">
-                <%= @code_review.problem_solving_scores.dig("code_reuse", "feedback") %>
+              <div class="col-md-7">
+                <div class="feedback-text">
+                  <%= @code_review.problem_solving_scores.dig("code_reuse", "feedback") %>
+                </div>
               </div>
             </div>
           </div>
@@ -198,36 +354,43 @@
       </div>
 
       <!-- Bonus Points -->
-      <div class="card mb-4">
-        <div class="card-header">
-          <h2>Bonus Points (<%= @code_review.bonus_scores["total_score"] %> / 15)</h2>
+      <div class="section-card mb-4">
+        <div class="section-header">
+          <h2 class="h5 mb-0">Bonus Points (<%= @code_review.bonus_scores["total_score"] %> / 15)</h2>
         </div>
         <div class="card-body">
-          <div class="ms-4 mb-3">
-            <div class="row mb-3">
-              <div class="col-md-2">Basic Testing:</div>
+          <div class="score-row">
+            <div class="row align-items-center">
+              <div class="col-md-3">Basic Testing:</div>
               <div class="col-md-2"><%= @code_review.bonus_scores.dig("basic_testing", "weighted_score") %> / 8</div>
-              <div class="col-md-2">Feedback:</div>
-              <div class="col-md-6 text-secondary">
-                <%= @code_review.bonus_scores.dig("basic_testing", "feedback") %>
+              <div class="col-md-7">
+                <div class="feedback-text">
+                  <%= @code_review.bonus_scores.dig("basic_testing", "feedback") %>
+                </div>
               </div>
             </div>
+          </div>
 
-            <div class="row mb-3">
-              <div class="col-md-2">Test Coverage:</div>
+          <div class="score-row">
+            <div class="row align-items-center">
+              <div class="col-md-3">Test Coverage:</div>
               <div class="col-md-2"><%= @code_review.bonus_scores.dig("test_coverage", "weighted_score") %> / 4</div>
-              <div class="col-md-2">Feedback:</div>
-              <div class="col-md-6 text-secondary">
-                <%= @code_review.bonus_scores.dig("test_coverage", "feedback") %>
+              <div class="col-md-7">
+                <div class="feedback-text">
+                  <%= @code_review.bonus_scores.dig("test_coverage", "feedback") %>
+                </div>
               </div>
             </div>
+          </div>
 
-            <div class="row mb-3">
-              <div class="col-md-2">Test Organization:</div>
+          <div class="score-row">
+            <div class="row align-items-center">
+              <div class="col-md-3">Test Organization:</div>
               <div class="col-md-2"><%= @code_review.bonus_scores.dig("test_organization", "weighted_score") %> / 3</div>
-              <div class="col-md-2">Feedback:</div>
-              <div class="col-md-6 text-secondary">
-                <%= @code_review.bonus_scores.dig("test_organization", "feedback") %>
+              <div class="col-md-7">
+                <div class="feedback-text">
+                  <%= @code_review.bonus_scores.dig("test_organization", "feedback") %>
+                </div>
               </div>
             </div>
           </div>
@@ -235,7 +398,7 @@
       </div>
 
       <% if @code_review.non_working_solution? %>
-        <div class="alert alert-warning">
+        <div class="alert alert-danger">
           <strong>Non-working Solution:</strong> -30 points
         </div>
       <% end %>
@@ -243,12 +406,14 @@
   </div>
 
   <% if @code_review.overall_comments.present? %>
-    <div class="card mb-4">
-      <div class="card-header">
-        <h2>Overall Comments</h2>
+    <div class="section-card mb-4">
+      <div class="section-header">
+        <h2 class="h4 mb-0">Overall Comments</h2>
       </div>
       <div class="card-body">
-        <%= simple_format @code_review.overall_comments %>
+        <div class="feedback-text">
+          <%= simple_format @code_review.overall_comments %>
+        </div>
       </div>
     </div>
   <% end %>
@@ -256,7 +421,7 @@
   <div class="delete-section mt-5 pt-4 border-top text-end">
     <%= button_to code_review_path(@code_review), 
                   method: :delete,
-                  class: 'btn btn-danger',
+                  class: 'action-button danger',
                   form: { 
                     data: { 
                       turbo_confirm: 'Are you sure you want to delete this review?' 

@@ -2,7 +2,7 @@ class CodeReviewsController < ApplicationController
   before_action :set_code_review, only: [:show, :edit, :update, :destroy]
 
   def index
-    @code_reviews = CodeReview.all
+    @code_reviews = CodeReview.order(:id)
   end
 
   def new

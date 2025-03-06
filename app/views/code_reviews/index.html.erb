@@ -1,13 +1,160 @@
+<%# Add custom styles %>
+<style>
+  .assessment-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    display: inline-block;
+  }
+  
+  .assessment-outstanding {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .assessment-excellent {
+    background-color: #2196F3;
+    color: white;
+  }
+  
+  .assessment-good {
+    background-color: #FF9800;
+    color: white;
+  }
+  
+  .assessment-fair {
+    background-color: #F44336;
+    color: white;
+  }
+
+  .action-button {
+    transition: all 0.2s ease;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .action-button:hover {
+    transform: translateY(-1px);
+  }
+
+  .action-button.primary {
+    background-color: #2563eb;
+    color: white;
+  }
+
+  .action-button.secondary {
+    background-color: #6b7280;
+    color: white;
+  }
+
+  .action-button.info {
+    background-color: #0ea5e9;
+    color: white;
+  }
+
+  .action-button.danger {
+    background-color: #dc2626;
+    color: white;
+  }
+
+  .action-button.outline {
+    border: 1px solid #6b7280;
+    color: #6b7280;
+    background-color: transparent;
+  }
+
+  .action-button.outline:hover {
+    background-color: #f3f4f6;
+  }
+
+  .reviews-table {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  .reviews-table thead {
+    background: linear-gradient(145deg, #2563eb, #1d4ed8);
+    color: white;
+  }
+
+  .reviews-table th {
+    font-weight: 500;
+    padding: 1rem;
+    border: none;
+  }
+
+  .reviews-table td {
+    padding: 1rem;
+    vertical-align: middle;
+  }
+
+  .reviews-table tbody tr {
+    transition: all 0.2s ease;
+  }
+
+  .reviews-table tbody tr:hover {
+    background-color: #f3f4f6;
+  }
+
+  .score-pill {
+    background: #e0e7ff;
+    color: #1e40af;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-weight: 500;
+  }
+
+  .status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-weight: 500;
+    font-size: 0.875rem;
+  }
+
+  .status-pending {
+    background-color: #fef3c7;
+    color: #92400e;
+  }
+
+  .status-processing {
+    background-color: #e0e7ff;
+    color: #1e40af;
+  }
+
+  .status-completed {
+    background-color: #d1fae5;
+    color: #065f46;
+  }
+
+  .status-failed {
+    background-color: #fee2e2;
+    color: #991b1b;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .action-buttons form {
+    margin: 0;
+  }
+</style>
+
 <div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Code Reviews</h1>
+    <h1 class="display-4">Code Reviews</h1>
     <div>
-      <%= link_to 'New Code Review', new_code_review_path, class: 'btn btn-primary' %>
+      <%= link_to 'New Code Review', new_code_review_path, class: 'action-button primary' %>
     </div>
   </div>
 
-  <div class="table-responsive">
-    <table class="table table-striped table-hover">
+  <div class="table-responsive reviews-table">
+    <table class="table table-hover mb-0">
       <thead>
         <tr>
           <th>Candidate</th>
@@ -25,25 +172,39 @@
             <td><%= review.candidate_name %></td>
             <td><%= review.reviewer_name %></td>
             <td>
-              <%= link_to "Link to Repo", review.repository_url, 
+              <%= link_to "View Repository", review.repository_url, 
                   target: '_blank', 
-                  class: 'btn btn-sm btn-outline-secondary' %>
+                  class: 'action-button outline btn-sm' %>
             </td>
-            <td><%= review.status.titleize %></td>
-            <td><%= review.total_score %> / 115</td>
-            <td><%= review.assessment_level %></td>
             <td>
-              <%= link_to 'View', review, class: 'btn btn-sm btn-info' %>
-              <%= link_to 'Edit', edit_code_review_path(review), class: 'btn btn-sm btn-primary' %>
-              <%= button_to 'Delete', review, 
-                  method: :delete, 
-                  class: 'btn btn-sm btn-danger',
-                  form: { 
-                    style: 'display: inline-block',
-                    data: { 
-                      turbo_confirm: 'Are you sure you want to delete this review?' 
-                    }
-                  } %>
+              <span class="status-badge status-<%= review.status %>">
+                <%= review.status.titleize %>
+              </span>
+            </td>
+            <td>
+              <span class="score-pill">
+                <%= review.total_score %> / 115
+              </span>
+            </td>
+            <td>
+              <span class="assessment-badge <%= "assessment-#{review.assessment_level.downcase.split(' ').first}" %>">
+                <%= review.assessment_level %>
+              </span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <%= link_to 'View', review, class: 'action-button info btn-sm' %>
+                <%= link_to 'Edit', edit_code_review_path(review), class: 'action-button primary btn-sm' %>
+                <%= button_to 'Delete', review, 
+                    method: :delete, 
+                    class: 'action-button danger btn-sm',
+                    form: { 
+                      style: 'display: inline-block',
+                      data: { 
+                        turbo_confirm: 'Are you sure you want to delete this review?' 
+                      }
+                    } %>
+              </div>
             </td>
           </tr>
         <% end %>
