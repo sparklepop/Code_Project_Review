@@ -339,62 +339,62 @@
       </div>
       <div class="card-body">
         <div class="row align-items-center mb-2">
-          <div class="col-md-3">Advanced Testing:</div>
+          <div class="col-md-3">Basic Testing:</div>
           <div class="col-md-2">
-            <%= f.number_field "bonus_scores[advanced_testing][weighted_score]", 
+            <%= f.number_field "bonus_scores[basic_testing][weighted_score]", 
                 class: "form-control", 
                 min: 0, 
-                max: 5,
-                value: @code_review.bonus_scores.dig("advanced_testing", "weighted_score") %>
+                max: 8,
+                value: @code_review.bonus_scores.dig("basic_testing", "weighted_score") %>
           </div>
-          <div class="col-md-2 text-muted">(max: 5)</div>
+          <div class="col-md-2 text-muted">(max: 8)</div>
         </div>
 
-        <%= f.text_area "bonus_scores[advanced_testing][feedback]", 
+        <%= f.text_area "bonus_scores[basic_testing][feedback]", 
             class: "form-control form-control-lg mb-4", 
-            placeholder: "Enter feedback for Advanced Testing...",
+            placeholder: "Enter feedback for Basic Testing...",
             rows: 3,
-            value: @code_review.bonus_scores.dig("advanced_testing", "feedback") %>
+            value: @code_review.bonus_scores.dig("basic_testing", "feedback") %>
 
         <hr class="my-4">
         
         <div class="row align-items-center mb-2">
-          <div class="col-md-3">Security Practices:</div>
+          <div class="col-md-3">Test Coverage:</div>
           <div class="col-md-2">
-            <%= f.number_field "bonus_scores[security_practices][weighted_score]", 
+            <%= f.number_field "bonus_scores[test_coverage][weighted_score]", 
                 class: "form-control", 
                 min: 0, 
-                max: 5,
-                value: @code_review.bonus_scores.dig("security_practices", "weighted_score") %>
+                max: 4,
+                value: @code_review.bonus_scores.dig("test_coverage", "weighted_score") %>
           </div>
-          <div class="col-md-2 text-muted">(max: 5)</div>
+          <div class="col-md-2 text-muted">(max: 4)</div>
         </div>
 
-        <%= f.text_area "bonus_scores[security_practices][feedback]", 
+        <%= f.text_area "bonus_scores[test_coverage][feedback]", 
             class: "form-control form-control-lg mb-4", 
-            placeholder: "Enter feedback for Security Practices...",
+            placeholder: "Enter feedback for Test Coverage...",
             rows: 3,
-            value: @code_review.bonus_scores.dig("security_practices", "feedback") %>
+            value: @code_review.bonus_scores.dig("test_coverage", "feedback") %>
 
         <hr class="my-4">
         
         <div class="row align-items-center mb-2">
-          <div class="col-md-3">Performance:</div>
+          <div class="col-md-3">Test Organization:</div>
           <div class="col-md-2">
-            <%= f.number_field "bonus_scores[performance_considerations][weighted_score]", 
+            <%= f.number_field "bonus_scores[test_organization][weighted_score]", 
                 class: "form-control", 
                 min: 0, 
-                max: 5,
-                value: @code_review.bonus_scores.dig("performance_considerations", "weighted_score") %>
+                max: 3,
+                value: @code_review.bonus_scores.dig("test_organization", "weighted_score") %>
           </div>
-          <div class="col-md-2 text-muted">(max: 5)</div>
+          <div class="col-md-2 text-muted">(max: 3)</div>
         </div>
 
-        <%= f.text_area "bonus_scores[performance_considerations][feedback]", 
+        <%= f.text_area "bonus_scores[test_organization][feedback]", 
             class: "form-control form-control-lg mb-4", 
-            placeholder: "Enter feedback for Performance Considerations...",
+            placeholder: "Enter feedback for Test Organization...",
             rows: 3,
-            value: @code_review.bonus_scores.dig("performance_considerations", "feedback") %>
+            value: @code_review.bonus_scores.dig("test_organization", "feedback") %>
       </div>
     </div>
 

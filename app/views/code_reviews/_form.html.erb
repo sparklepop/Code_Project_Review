@@ -237,38 +237,38 @@
     <div class="card-body">
       <div class="form-group">
         <div class="score-label">
-          <%= f.number_field "testing_scores][coverage", 
-                            value: code_review.testing_scores["coverage"],
+          <%= f.number_field "bonus_scores][basic_testing", 
+                            value: code_review.bonus_scores["basic_testing"],
                             class: "form-control score-input",
-                            min: 0, max: 7,
+                            min: 0, max: 8,
                             data: { code_review_target: "scoreInput",
-                                   score_type: "testing_scores",
-                                   score_field: "coverage" } %>
-          <label>Coverage (max 7)</label>
+                                   score_type: "bonus_scores",
+                                   score_field: "basic_testing" } %>
+          <label>Basic Testing (max 8)</label>
         </div>
       </div>
       <div class="form-group">
         <div class="score-label">
-          <%= f.number_field "testing_scores][quality", 
-                            value: code_review.testing_scores["quality"],
+          <%= f.number_field "bonus_scores][test_coverage", 
+                            value: code_review.bonus_scores["test_coverage"],
                             class: "form-control score-input",
-                            min: 0, max: 5,
+                            min: 0, max: 4,
                             data: { code_review_target: "scoreInput",
-                                   score_type: "testing_scores",
-                                   score_field: "quality" } %>
-          <label>Quality (max 5)</label>
+                                   score_type: "bonus_scores",
+                                   score_field: "test_coverage" } %>
+          <label>Test Coverage (max 4)</label>
         </div>
       </div>
       <div class="form-group">
         <div class="score-label">
-          <%= f.number_field "testing_scores][edge_cases", 
-                            value: code_review.testing_scores["edge_cases"],
+          <%= f.number_field "bonus_scores][test_organization", 
+                            value: code_review.bonus_scores["test_organization"],
                             class: "form-control score-input",
                             min: 0, max: 3,
                             data: { code_review_target: "scoreInput",
-                                   score_type: "testing_scores",
-                                   score_field: "edge_cases" } %>
-          <label>Edge Cases (max 3)</label>
+                                   score_type: "bonus_scores",
+                                   score_field: "test_organization" } %>
+          <label>Test Organization (max 3)</label>
         </div>
       </div>
     </div>

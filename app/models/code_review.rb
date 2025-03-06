@@ -35,9 +35,9 @@ class CodeReview < ApplicationRecord
     :category_total
 
   store_accessor :bonus_scores,
-    :advanced_testing,
-    :security_practices,
-    :performance_considerations,
+    :basic_testing,
+    :test_coverage,
+    :test_organization,
     :category_total
 
   # Initialize and convert scores before save
@@ -102,15 +102,8 @@ class CodeReview < ApplicationRecord
       results[:problem_solving_scores][:total_score] = format("%.1f", total[:problem_solving])
       results[:bonus_scores][:total_score] = format("%.1f", total[:bonus])
       
-      Rails.logger.debug "\n=== Before Database Update ==="
-      Rails.logger.debug "Status: #{:completed}"
-      Rails.logger.debug "Clarity Scores: #{results[:clarity_scores].inspect}"
-      Rails.logger.debug "Architecture Scores: #{results[:architecture_scores].inspect}"
-      Rails.logger.debug "Practices Scores: #{results[:practices_scores].inspect}"
-      Rails.logger.debug "Problem Solving Scores: #{results[:problem_solving_scores].inspect}"
-      Rails.logger.debug "Bonus Scores: #{results[:bonus_scores].inspect}"
-      Rails.logger.debug "Total Score: #{format("%.1f", final_total)}"
-      Rails.logger.debug "Assessment Level: #{calculate_assessment_level(final_total)}"
+      Rails.logger.debug "\n=== Bonus Scores Before Save ==="
+      Rails.logger.debug "Raw bonus scores from analysis: #{results[:bonus_scores].inspect}"
       
       result = update!(
         status: :completed,
@@ -122,6 +115,14 @@ class CodeReview < ApplicationRecord
         total_score: format("%.1f", final_total),
         assessment_level: calculate_assessment_level(final_total)
       )
+      
+      Rails.logger.debug "\n=== Bonus Scores After Save ==="
+      Rails.logger.debug "Saved bonus_scores attribute: #{bonus_scores.inspect}"
+      Rails.logger.debug "Individual bonus scores:"
+      Rails.logger.debug "- Basic Testing: #{bonus_scores['basic_testing'].inspect}"
+      Rails.logger.debug "- Test Coverage: #{bonus_scores['test_coverage'].inspect}"
+      Rails.logger.debug "- Test Organization: #{bonus_scores['test_organization'].inspect}"
+      Rails.logger.debug "- Category Total: #{bonus_scores['category_total'].inspect}"
       
       Rails.logger.debug "\n=== After Database Update ==="
       Rails.logger.debug "Update Result: #{result.inspect}"
@@ -157,23 +158,34 @@ class CodeReview < ApplicationRecord
   private
 
   def process_scores
+    Rails.logger.debug "\n=== Processing Scores ==="
+    
     score_attributes.each do |attr|
+      Rails.logger.debug "\nProcessing #{attr}:"
       current_scores = send(attr)
+      Rails.logger.debug "Initial value: #{current_scores.inspect}"
       
       # Convert the scores to a hash if needed
       scores = case current_scores
               when String
+                Rails.logger.debug "Converting from String"
                 JSON.parse(current_scores) rescue {}
               when ActionController::Parameters
+                Rails.logger.debug "Converting from ActionController::Parameters"
                 current_scores.to_unsafe_h
               when Hash
+                Rails.logger.debug "Already a Hash"
                 current_scores
               else
+                Rails.logger.debug "Unknown type, defaulting to empty hash"
                 {}
               end
       
-      # Don't transform the values, keep the structure
+      Rails.logger.debug "Processed value: #{scores.inspect}"
       send("#{attr}=", scores)
+      
+      # Verify the assignment
+      Rails.logger.debug "Final stored value: #{send(attr).inspect}"
     end
   end
 

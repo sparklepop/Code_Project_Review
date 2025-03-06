@@ -76,22 +76,10 @@ module Ai
       problem_solving_scores = analyze_problem_solving(ruby_files, js_files)
       Rails.logger.debug "Problem solving scores: #{problem_solving_scores.inspect}"
       
-      # Temporarily disable bonus points calculation
-      bonus_scores = {
-        basic_testing: { score: 0, weight: 8 },
-        test_coverage: { score: 0, weight: 4 },
-        test_organization: { score: 0, weight: 3 },
-        total_score: 0,
-        feedback: "Bonus point calculation temporarily disabled",
-        details: {
-          issues: [],
-          good_examples: [],
-          metrics: {
-            test_stats: { test_count: 0, assertions: 0, test_files: 0 },
-            organization: { test_directories: Set.new, helper_modules: 0, shared_examples: 0, consistent_structure: true }
-          }
-        }
-      }
+      # Calculate bonus points
+      Rails.logger.debug "Analyzing bonus points..."
+      bonus_scores = analyze_bonus_points(ruby_files, js_files, test_files)
+      Rails.logger.debug "Bonus scores: #{bonus_scores.inspect}"
       
       results = {
         clarity_scores: clarity_scores,
@@ -175,23 +163,21 @@ module Ai
     end
 
     def analyze_separation_of_concerns(ruby_files, js_files)
-      Rails.logger.debug "Starting analyze_separation_of_concerns"
-      
-      issues = []
-      good_examples = []
-      
-      # Initialize metrics with default values
+      Rails.logger.debug "\n=== Starting analyze_separation_of_concerns ==="
+      Rails.logger.debug "Ruby files: #{ruby_files.keys.inspect}"
+      Rails.logger.debug "JS files: #{js_files.keys.inspect}"
+
+      # Initialize metrics
       class_metrics = {}
       controller_metrics = {}
       model_metrics = {}
       service_metrics = {}
       
-      Rails.logger.debug "Analyzing #{ruby_files.size} Ruby files and #{js_files.size} JS files"
-      
-      # Pre-initialize metrics for ALL files with default values
+      # Pre-initialize metrics for all files
+      Rails.logger.debug "\nPre-initializing metrics for all files"
       (ruby_files.keys + js_files.keys).each do |path|
         class_name = File.basename(path, File.extname(path)).camelize
-        Rails.logger.debug "Pre-initializing metrics for #{class_name}"
+        Rails.logger.debug "Initializing metrics for #{class_name}"
         class_metrics[class_name] = {
           method_count: 0,
           dependency_count: 0,
@@ -199,148 +185,169 @@ module Ai
           mixin_count: 0
         }
       end
-      
-      begin
-        # Analyze Ruby files
-        ruby_files.each do |path, content|
-          next if content.nil? || content.strip.empty?
-          
-          class_name = File.basename(path, '.rb').camelize
-          Rails.logger.debug "Analyzing Ruby file: #{path} (#{class_name})"
-          
-          # Ensure metrics exist for this class
-          class_metrics[class_name] ||= {
-            method_count: 0,
-            dependency_count: 0,
-            inheritance_depth: 0,
-            mixin_count: 0
-          }
-          
-          if path.include?('app/controllers/')
-            controller_metrics[class_name] ||= { action_count: 0, lines_of_business_logic: 0, before_actions: 0 }
-            analyze_controller(path, content, controller_metrics, issues, good_examples)
-          elsif path.include?('app/models/')
-            model_metrics[class_name] ||= { instance_method_count: 0, class_method_count: 0, association_count: 0, callback_count: 0, validation_count: 0 }
-            analyze_model(path, content, model_metrics, issues, good_examples)
-          elsif path.include?('app/services/')
-            service_metrics[class_name] ||= { public_method_count: 0, private_method_count: 0, dependency_count: 0, responsibility_focus: :single }
-            analyze_service(path, content, service_metrics, issues, good_examples)
-          end
-          
-          # General class analysis
-          analyze_class_structure(path, content, class_metrics, issues, good_examples)
-          Rails.logger.debug "Class metrics after analyzing #{path}: #{class_metrics[class_name].inspect}"
-        end
-        
-        # Analyze JavaScript/TypeScript files
-        js_files.each do |path, content|
-          next if content.nil? || content.strip.empty?
-          
-          component_name = File.basename(path, File.extname(path))
-          Rails.logger.debug "Analyzing JS file: #{path} (#{component_name})"
-          
-          # Ensure metrics exist for this component
-          class_metrics[component_name] ||= {
-            method_count: 0,
-            dependency_count: 0,
-            inheritance_depth: 0,
-            mixin_count: 0
-          }
-          
-          analyze_js_component(path, content, class_metrics, issues, good_examples)
-          Rails.logger.debug "Class metrics after analyzing #{path}: #{class_metrics[component_name].inspect}"
-        end
-        
-        Rails.logger.debug "Final class metrics: #{class_metrics.inspect}"
-        
-        # Calculate base score with defensive checks
-        score = 10.0
-        
-        # Analyze controller metrics with nil safety
-        if controller_metrics.any?
-          action_counts = controller_metrics.values.map { |m| m[:action_count] || 0 }
-          avg_controller_actions = action_counts.sum.to_f / controller_metrics.size
-          
-          if avg_controller_actions > 7
-            score -= 1
-            issues << { general: "Controllers average #{avg_controller_actions.round(1)} actions. Consider breaking down large controllers." }
-          end
-          
-          fat_controllers = controller_metrics.select { |_, m| (m[:lines_of_business_logic] || 0) > 50 }
-          if fat_controllers.any?
-            score -= 1
-            issues << { general: "Found #{fat_controllers.size} controllers with excessive business logic. Move logic to models or services." }
-          end
-        end
-        
-        # Analyze model metrics with nil safety
-        if model_metrics.any?
-          fat_models = model_metrics.select { |_, m| (m[:instance_method_count] || 0) > 15 }
-          if fat_models.any?
-            score -= 1
-            issues << { general: "Found #{fat_models.size} models with too many instance methods. Consider extracting concerns or creating service objects." }
-          end
-        end
-        
-        # Analyze class coupling with nil safety
-        Rails.logger.debug "Checking high coupling..."
-        high_coupling = class_metrics.select do |name, metrics|
-          Rails.logger.debug "Checking coupling for #{name}: #{metrics.inspect}"
-          next false if metrics.nil? || !metrics.is_a?(Hash)
-          next false if metrics[:dependency_count].nil?
-          metrics[:dependency_count] > 5
-        end
-        
-        if high_coupling.any?
-          score -= 1
-          issues << { general: "Found #{high_coupling.size} classes with high coupling (>5 dependencies). Consider reducing dependencies." }
-        end
-        
-        # Check service object usage
-        if service_metrics.empty? && (controller_metrics.any? || model_metrics.any?)
-          score -= 0.5
-          issues << { general: "No service objects found. Consider using service objects for complex business logic." }
-        end
-        
-        # Generate feedback
-        feedback = generate_separation_feedback(issues, good_examples, {
-          controllers: controller_metrics,
-          models: model_metrics,
-          services: service_metrics,
-          classes: class_metrics
-        })
-        
-        {
-          score: score.clamp(0, 10),
-          feedback: feedback,
-          details: {
-            issues: issues,
-            good_examples: good_examples,
-            metrics: {
-              controller_count: controller_metrics.size,
-              model_count: model_metrics.size,
-              service_count: service_metrics.size,
-              high_coupling_count: high_coupling.size
-            }
-          }
-        }
-      rescue => e
-        Rails.logger.error "Error in analyze_separation_of_concerns: #{e.message}\n#{e.backtrace.join("\n")}"
-        {
-          score: 5.0, # Default middle score on error
-          feedback: "Error analyzing separation of concerns: #{e.message}",
-          details: {
-            issues: [{ general: "Error during analysis: #{e.message}" }],
-            good_examples: [],
-            metrics: {
-              controller_count: controller_metrics.size,
-              model_count: model_metrics.size,
-              service_count: service_metrics.size,
-              high_coupling_count: 0
-            }
-          }
-        }
+
+      Rails.logger.debug "\nInitial class_metrics state:"
+      class_metrics.each do |name, metrics|
+        Rails.logger.debug "#{name}: #{metrics.inspect}"
       end
+
+      # Initialize high coupling tracking
+      high_coupling = {}
+      Rails.logger.debug "\nStarting high coupling analysis"
+
+      # Process each class's metrics
+      class_metrics.each do |name, metrics|
+        Rails.logger.debug "\nAnalyzing coupling for #{name}:"
+        Rails.logger.debug "Raw metrics: #{metrics.inspect}"
+        
+        unless metrics.is_a?(Hash)
+          Rails.logger.debug "Skipping #{name}: metrics is not a hash"
+          next
+        end
+
+        dependency_count = metrics.fetch(:dependency_count, 0)
+        Rails.logger.debug "Dependency count (before to_i): #{dependency_count.inspect}"
+        dependency_count = dependency_count.to_i
+        Rails.logger.debug "Dependency count (after to_i): #{dependency_count}"
+
+        if dependency_count > 5
+          Rails.logger.debug "High coupling detected for #{name} with #{dependency_count} dependencies"
+          high_coupling[name] = metrics.dup
+        end
+      end
+
+      Rails.logger.debug "\nHigh coupling analysis complete"
+      Rails.logger.debug "Found #{high_coupling.size} instances of high coupling"
+      Rails.logger.debug "High coupling classes: #{high_coupling.keys.inspect}"
+      
+      issues = []
+      good_examples = []
+      
+      # Analyze Ruby files
+      ruby_files.each do |path, content|
+        next if content.nil? || content.strip.empty?
+        
+        class_name = File.basename(path, '.rb').camelize
+        Rails.logger.debug "Analyzing Ruby file: #{path} (#{class_name})"
+        
+        # Ensure metrics exist for this class
+        class_metrics[class_name] ||= {
+          method_count: 0,
+          dependency_count: 0,
+          inheritance_depth: 0,
+          mixin_count: 0
+        }
+        
+        if path.include?('app/controllers/')
+          controller_metrics[class_name] ||= { action_count: 0, lines_of_business_logic: 0, before_actions: 0 }
+          analyze_controller(path, content, controller_metrics, issues, good_examples)
+        elsif path.include?('app/models/')
+          model_metrics[class_name] ||= { instance_method_count: 0, class_method_count: 0, association_count: 0, callback_count: 0, validation_count: 0 }
+          analyze_model(path, content, model_metrics, issues, good_examples)
+        elsif path.include?('app/services/')
+          service_metrics[class_name] ||= { public_method_count: 0, private_method_count: 0, dependency_count: 0, responsibility_focus: :single }
+          analyze_service(path, content, service_metrics, issues, good_examples)
+        end
+        
+        # General class analysis
+        analyze_class_structure(path, content, class_metrics, issues, good_examples)
+        Rails.logger.debug "Class metrics after analyzing #{path}: #{class_metrics[class_name].inspect}"
+      end
+      
+      # Analyze JavaScript/TypeScript files
+      js_files.each do |path, content|
+        next if content.nil? || content.strip.empty?
+        
+        component_name = File.basename(path, File.extname(path))
+        Rails.logger.debug "Analyzing JS file: #{path} (#{component_name})"
+        
+        # Ensure metrics exist for this component
+        class_metrics[component_name] ||= {
+          method_count: 0,
+          dependency_count: 0,
+          inheritance_depth: 0,
+          mixin_count: 0
+        }
+        
+        analyze_js_component(path, content, class_metrics, issues, good_examples)
+        Rails.logger.debug "Class metrics after analyzing #{path}: #{class_metrics[component_name].inspect}"
+      end
+      
+      Rails.logger.debug "Final class metrics: #{class_metrics.inspect}"
+      
+      # Calculate base score with defensive checks
+      score = 10.0
+      
+      # Analyze controller metrics with nil safety
+      if controller_metrics.any?
+        action_counts = controller_metrics.values.map { |m| m[:action_count] || 0 }
+        avg_controller_actions = action_counts.sum.to_f / controller_metrics.size
+        
+        if avg_controller_actions > 7
+          score -= 1
+          issues << { general: "Controllers average #{avg_controller_actions.round(1)} actions. Consider breaking down large controllers." }
+        end
+        
+        fat_controllers = controller_metrics.select { |_, m| (m[:lines_of_business_logic] || 0) > 50 }
+        if fat_controllers.any?
+          score -= 1
+          issues << { general: "Found #{fat_controllers.size} controllers with excessive business logic. Move logic to models or services." }
+        end
+      end
+      
+      # Analyze model metrics with nil safety
+      if model_metrics.any?
+        fat_models = model_metrics.select { |_, m| (m[:instance_method_count] || 0) > 15 }
+        if fat_models.any?
+          score -= 1
+          issues << { general: "Found #{fat_models.size} models with too many instance methods. Consider extracting concerns or creating service objects." }
+        end
+      end
+      
+      # Check service object usage
+      if service_metrics.empty? && (controller_metrics.any? || model_metrics.any?)
+        score -= 0.5
+        issues << { general: "No service objects found. Consider using service objects for complex business logic." }
+      end
+      
+      # Generate feedback
+      feedback = generate_separation_feedback(issues, good_examples, {
+        controllers: controller_metrics,
+        models: model_metrics,
+        services: service_metrics,
+        classes: class_metrics
+      })
+      
+      {
+        score: score.clamp(0, 10),
+        feedback: feedback,
+        details: {
+          issues: issues,
+          good_examples: good_examples,
+          metrics: {
+            controller_count: controller_metrics.size,
+            model_count: model_metrics.size,
+            service_count: service_metrics.size,
+            high_coupling_count: high_coupling.size
+          }
+        }
+      }
+    rescue => e
+      Rails.logger.error "Error in analyze_separation_of_concerns: #{e.message}\n#{e.backtrace.join("\n")}"
+      {
+        score: 5.0, # Default middle score on error
+        feedback: "Error analyzing separation of concerns: #{e.message}",
+        details: {
+          issues: [{ general: "Error during analysis: #{e.message}" }],
+          good_examples: [],
+          metrics: {
+            controller_count: controller_metrics.size,
+            model_count: model_metrics.size,
+            service_count: service_metrics.size,
+            high_coupling_count: 0
+          }
+        }
+      }
     end
 
     def analyze_controller(path, content, metrics, issues, good_examples)
@@ -2031,338 +2038,80 @@ module Ai
 
     def analyze_bonus_points(ruby_files, js_files, test_files)
       begin
-        Rails.logger.debug "Starting analyze_bonus_points"
+        Rails.logger.debug "Starting simplified analyze_bonus_points"
         
-        metrics = {
-          test_stats: {
-            test_count: 0,
-            assertions: 0,
-            test_files: 0
-          },
-          organization: {
-            test_directories: Set.new,
-            helper_modules: 0,
-            shared_examples: 0,
-            consistent_structure: true
-          }
-        }
-        
-        issues = []
-        good_examples = []
-        
-        # Analyze each test file
-        test_files&.each do |path, content|
-          begin
-            Rails.logger.debug "Analyzing test file: #{path}"
-            analyze_test_file(path, content, metrics, issues, good_examples)
-          rescue => e
-            Rails.logger.error "Error analyzing test file #{path}: #{e.message}\n#{e.backtrace.join("\n")}"
-            issues << { file: path, issue: "Error analyzing test file: #{e.message}" }
-          end
+        # Simple check for test files
+        has_tests = test_files&.any? do |path, content|
+          path.match?(/\b(test|spec)\b/) && content.to_s.strip.length > 0
         end
         
-        # Calculate scores
-        basic_testing_score = calculate_basic_testing_score(metrics)
-        test_coverage_score = calculate_test_coverage_score(metrics)
-        test_organization_score = calculate_test_organization_score(metrics)
+        Rails.logger.debug "Test files present: #{has_tests}"
         
+        # Base scores
+        basic_testing_score = {
+          score: has_tests ? 8 : 0,
+          feedback: has_tests ? "Basic tests are present." : "No tests found."
+        }
+        
+        test_coverage_score = {
+          score: 0,
+          feedback: "Test coverage analysis disabled."
+        }
+        
+        test_organization_score = {
+          score: 0,
+          feedback: "Test organization analysis disabled."
+        }
+
+        # Calculate weighted scores
+        weighted_basic_testing = calculate_weighted_score(basic_testing_score[:score], :bonus, :basic_testing)
+        weighted_test_coverage = calculate_weighted_score(test_coverage_score[:score], :bonus, :test_coverage)
+        weighted_test_organization = calculate_weighted_score(test_organization_score[:score], :bonus, :test_organization)
+
+        # Calculate total
+        total = weighted_basic_testing + weighted_test_coverage + weighted_test_organization
+
         {
-          basic_testing: {
-            score: basic_testing_score,
-            weight: 8
-          },
-          test_coverage: {
-            score: test_coverage_score,
-            weight: 4
-          },
-          test_organization: {
-            score: test_organization_score,
-            weight: 3
-          },
-          feedback: generate_testing_feedback(metrics, issues, good_examples),
+          basic_testing: basic_testing_score.merge(weighted_score: weighted_basic_testing),
+          test_coverage: test_coverage_score.merge(weighted_score: weighted_test_coverage),
+          test_organization: test_organization_score.merge(weighted_score: weighted_test_organization),
+          total_score: total,
           details: {
-            issues: issues,
-            good_examples: good_examples,
-            metrics: metrics
+            issues: [],
+            good_examples: [],
+            metrics: {
+              test_stats: { 
+                test_count: has_tests ? 1 : 0, 
+                assertions: 0, 
+                test_files: has_tests ? 1 : 0 
+              },
+              organization: { 
+                test_directories: [], 
+                helper_modules: 0, 
+                shared_examples: 0, 
+                consistent_structure: true 
+              }
+            }
           }
         }
       rescue => e
         Rails.logger.error "Error in analyze_bonus_points: #{e.message}\n#{e.backtrace.join("\n")}"
         {
-          basic_testing: { score: 0, weight: 8 },
-          test_coverage: { score: 0, weight: 4 },
-          test_organization: { score: 0, weight: 3 },
-          feedback: "Error analyzing testing practices: #{e.message}",
+          basic_testing: { score: 0, weighted_score: 0, feedback: "Error analyzing basic testing." },
+          test_coverage: { score: 0, weighted_score: 0, feedback: "Error analyzing test coverage." },
+          test_organization: { score: 0, weighted_score: 0, feedback: "Error analyzing test organization." },
+          total_score: 0,
           details: {
             issues: [{ issue: "Error analyzing testing practices: #{e.message}" }],
             good_examples: [],
             metrics: {
               test_stats: { test_count: 0, assertions: 0, test_files: 0 },
-              organization: { test_directories: Set.new, helper_modules: 0, shared_examples: 0, consistent_structure: true }
+              organization: { test_directories: [], helper_modules: 0, shared_examples: 0, consistent_structure: true }
             }
           }
         }
       end
     end
-
-    def analyze_rspec_tests(path, content, metrics, issues, good_examples)
-      begin
-        Rails.logger.debug "Analyzing RSpec tests in #{path}"
-        
-        # Initialize test_stats if not present
-        metrics[:test_stats] ||= { test_count: 0, assertions: 0, test_files: 0 }
-        
-        # More lenient test pattern that matches both block and one-liner syntax
-        test_matches = content.scan(/\bit\s+['"].*?['"](?:\s*do|\s*{|\s*\}|\s*$)/)
-        Rails.logger.debug "Found #{test_matches.size} tests: #{test_matches.inspect}"
-        
-        # Also look for describe blocks with it blocks inside
-        describe_blocks = content.scan(/describe\s+['"].*?['"].*?do\s*$/)
-        Rails.logger.debug "Found #{describe_blocks.size} describe blocks"
-        
-        # Update test count
-        test_count = test_matches.size
-        metrics[:test_stats][:test_count] += test_count
-        
-        # Look for all possible assertion keywords
-        assertion_patterns = [
-          /\bexpect\(.+?\)\.to\b/,
-          /\bexpect\(.+?\)\.not_to\b/,
-          /\bshould\b/,
-          /\bshould_not\b/,
-          /\bassert\w*\b/,
-          /\bvalidate_presence_of\b/,
-          /\bis_expected\.to\b/
-        ]
-        
-        assertion_count = 0
-        assertion_patterns.each do |pattern|
-          matches = content.scan(pattern)
-          assertion_count += matches.size
-          Rails.logger.debug "Found #{matches.size} assertions matching #{pattern.inspect}"
-        end
-        
-        metrics[:test_stats][:assertions] += assertion_count
-        metrics[:test_stats][:test_files] += 1 if test_count > 0
-        
-        # Track test organization
-        metrics[:organization] ||= {
-          test_directories: Set.new,
-          helper_modules: 0,
-          shared_examples: 0,
-          consistent_structure: true
-        }
-        
-        # Check for test helpers and organization
-        if content.match?(/\b(before|after|let|subject|shared_examples|shared_context)\b/)
-          metrics[:organization][:helper_modules] += 1
-        end
-        
-        if content.match?(/\b(shared_examples|shared_context|it_behaves_like)\b/)
-          metrics[:organization][:shared_examples] += 1
-        end
-        
-        Rails.logger.debug "Final metrics for #{path}: #{metrics.inspect}"
-      rescue => e
-        Rails.logger.error "Error in analyze_rspec_tests for #{path}: #{e.message}\n#{e.backtrace.join("\n")}"
-        # Don't reset metrics, just log the error
-      end
-    end
-
-    def analyze_minitest_tests(path, content, metrics, issues, good_examples)
-      # Count tests and assertions
-      metrics[:test_stats][:test_count] += content.scan(/\bdef\s+test_/).size
-      metrics[:test_stats][:assertions] += content.scan(/\b(assert|refute)\w*\b/).size
-      
-      # Identify tested functions
-      content.scan(/test_(\w+)/).each do |match|
-        metrics[:coverage][:core_functions_tested].add(match[0])
-      end
-      
-      # Check for good testing practices
-      if content.match?(/\b(setup|teardown|before|after)\b/)
-        good_examples << {
-          file: path,
-          note: "Good use of Minitest lifecycle hooks"
-        }
-      end
-    end
-
-    def analyze_jest_tests(path, content, metrics, issues, good_examples)
-      # Count tests and assertions
-      metrics[:test_stats][:test_count] += content.scan(/\bit\s*\(/).size
-      metrics[:test_stats][:assertions] += content.scan(/\b(expect|assert)\b/).size
-      
-      # Identify tested functions
-      content.scan(/describe\s*\(['"](.+?)['"]/).each do |match|
-        metrics[:coverage][:core_functions_tested].add(match[0])
-      end
-      
-      # Check for good testing practices
-      if content.match?(/\b(beforeEach|afterEach|beforeAll|afterAll)\b/)
-        good_examples << {
-          file: path,
-          note: "Good use of Jest lifecycle hooks"
-        }
-      end
-      
-      # Check for test organization
-      if content.match?(/\b(describe|context)\b/)
-        good_examples << {
-          file: path,
-          note: "Well-organized test structure with describe blocks"
-        }
-      end
-    end
-
-    def calculate_basic_testing_score(metrics)
-      begin
-        return 0 unless metrics && metrics[:test_stats]
-        
-        score = 10.0
-        test_stats = metrics[:test_stats]
-        
-        # Basic presence of tests
-        return 0 if test_stats[:test_count].to_i == 0
-        
-        # Deduct for low test count
-        if test_stats[:test_count].to_i < 5
-          score -= 3
-        elsif test_stats[:test_count].to_i < 10
-          score -= 1.5
-        end
-        
-        # Deduct for low assertion count
-        assertions = test_stats[:assertions].to_i
-        test_count = test_stats[:test_count].to_i
-        assertions_per_test = test_count > 0 ? assertions.to_f / test_count : 0
-        
-        if assertions_per_test < 1
-          score -= 2
-        elsif assertions_per_test < 2
-          score -= 1
-        end
-        
-        # Ensure score stays within bounds
-        score.clamp(0, 10)
-      rescue => e
-        Rails.logger.error "Error calculating basic testing score: #{e.message}"
-        0  # Return 0 for any error case
-      end
-    end
-
-    def calculate_test_coverage_score(metrics)
-      begin
-        return 0 unless metrics && metrics[:test_stats]
-        return 0 if metrics[:test_stats][:test_count].to_i == 0
-        
-        score = 10.0
-        test_stats = metrics[:test_stats]
-        
-        # Calculate coverage based on test count and assertions
-        test_count = test_stats[:test_count].to_i
-        assertions = test_stats[:assertions].to_i
-        
-        # Minimum requirements for a non-zero score
-        return 0 if test_count == 0 || assertions == 0
-        
-        # Deduct points for low test count
-        if test_count < 5
-          score -= 5
-        elsif test_count < 10
-          score -= 2.5
-        end
-        
-        # Deduct points for low assertions per test
-        assertions_per_test = assertions.to_f / test_count
-        if assertions_per_test < 1
-          score -= 5
-        elsif assertions_per_test < 2
-          score -= 2.5
-        end
-        
-        score.clamp(0, 10)
-      rescue => e
-        Rails.logger.error "Error calculating test coverage score: #{e.message}"
-        0  # Return 0 for any error case
-      end
-    end
-
-    def calculate_test_organization_score(metrics)
-      return 0 unless metrics && metrics[:test_stats]
-      
-      score = 10.0
-      test_stats = metrics[:test_stats]
-      
-      # Check test organization
-      if test_stats[:test_files].to_i == 0
-        return 0
-      end
-      
-      # Deduct for poor organization
-      if !test_stats[:proper_directory]
-        score -= 3
-      end
-      
-      if !test_stats[:proper_naming]
-        score -= 2
-      end
-      
-      score.clamp(0, 10)
-    end
-
-    def generate_testing_feedback(metrics, issues, good_examples)
-      feedback = []
-      
-      # Overall testing assessment
-      if metrics[:test_stats][:test_count] == 0
-        feedback << "No tests found. Consider adding basic tests for core functionality."
-      else
-        feedback << "Found #{metrics[:test_stats][:test_count]} tests with #{metrics[:test_stats][:assertions]} assertions."
-      end
-      
-      # Coverage assessment
-      if metrics[:coverage][:core_functions_tested].any?
-        coverage_ratio = metrics[:coverage][:core_functions_tested].size.to_f / 
-                        [metrics[:coverage][:core_functions_total].size, 1].max
-        
-        feedback << case coverage_ratio
-          when 0.8..1.0
-            "Excellent test coverage of core functionality."
-          when 0.5..0.8
-            "Good test coverage with room for improvement."
-          else
-            "Consider adding more tests to cover core functionality."
-        end  # Add missing end for case statement
-      end
-      
-      # Organization assessment
-      if metrics[:organization][:helper_modules] > 0
-        feedback << "Good use of test helpers and setup."
-      end
-      
-      if metrics[:organization][:shared_examples] > 0
-        feedback << "Good use of shared examples and test organization."
-      end
-      
-      # Highlight good examples
-      if good_examples.any?
-        feedback << "\nGood testing practices:"
-        good_examples.take(2).each do |example|
-          feedback << "- #{example[:note]}"
-        end
-      end
-      
-      # Suggest improvements
-      if issues.any?
-        feedback << "\nSuggested testing improvements:"
-        issues.each do |issue|
-          feedback << "- #{issue[:suggestion]}"
-        end
-      end
-      
-      feedback.join("\n")
-    end  # Add missing end for generate_testing_feedback
 
     def calculate_weighted_score(score, category, subcategory)
       Rails.logger.debug "Calculating weighted score for #{category}:#{subcategory} with score: #{score.inspect}"

@@ -205,29 +205,29 @@
         <div class="card-body">
           <div class="ms-4 mb-3">
             <div class="row mb-3">
-              <div class="col-md-2">Advanced Testing:</div>
-              <div class="col-md-2"><%= @code_review.bonus_scores.dig("advanced_testing", "weighted_score") %> / 5</div>
+              <div class="col-md-2">Basic Testing:</div>
+              <div class="col-md-2"><%= @code_review.bonus_scores.dig("basic_testing", "weighted_score") %> / 8</div>
               <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
-                <%= @code_review.bonus_scores.dig("advanced_testing", "feedback") %>
+                <%= @code_review.bonus_scores.dig("basic_testing", "feedback") %>
               </div>
             </div>
 
             <div class="row mb-3">
-              <div class="col-md-2">Security Practices:</div>
-              <div class="col-md-2"><%= @code_review.bonus_scores.dig("security_practices", "weighted_score") %> / 5</div>
+              <div class="col-md-2">Test Coverage:</div>
+              <div class="col-md-2"><%= @code_review.bonus_scores.dig("test_coverage", "weighted_score") %> / 4</div>
               <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
-                <%= @code_review.bonus_scores.dig("security_practices", "feedback") %>
+                <%= @code_review.bonus_scores.dig("test_coverage", "feedback") %>
               </div>
             </div>
 
             <div class="row mb-3">
-              <div class="col-md-2">Performance:</div>
-              <div class="col-md-2"><%= @code_review.bonus_scores.dig("performance_considerations", "weighted_score") %> / 5</div>
+              <div class="col-md-2">Test Organization:</div>
+              <div class="col-md-2"><%= @code_review.bonus_scores.dig("test_organization", "weighted_score") %> / 3</div>
               <div class="col-md-2">Feedback:</div>
               <div class="col-md-6 text-secondary">
-                <%= @code_review.bonus_scores.dig("performance_considerations", "feedback") %>
+                <%= @code_review.bonus_scores.dig("test_organization", "feedback") %>
               </div>
             </div>
           </div>
