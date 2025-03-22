@@ -1,5 +1,6 @@
 <%# Add custom styles %>
 <style>
+  /* Assessment badges */
   .assessment-badge {
     padding: 0.35rem 0.75rem;
     border-radius: 20px;
@@ -28,6 +29,7 @@
     color: white;
   }
 
+  /* Action buttons */
   .action-button {
     transition: all 0.2s ease;
     border-radius: 8px;
@@ -70,36 +72,44 @@
     background-color: #f3f4f6;
   }
 
-  .reviews-table {
+  /* Table container */
+  .table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 2rem;
     border-radius: 15px;
-    overflow: hidden;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   }
 
-  .reviews-table thead {
-    background: linear-gradient(145deg, #2563eb, #1d4ed8);
-    color: white;
+  /* Table styles */
+  .reviews-table {
+    width: 100%;
+    min-width: 1000px;
+    margin-bottom: 0;
   }
 
-  .reviews-table th {
-    font-weight: 500;
+  .reviews-table thead th {
+    color: #ffffff !important;
+    font-weight: 600;
     padding: 1rem;
     border: none;
+    white-space: nowrap;
+    background: #2563eb;
   }
 
   .reviews-table td {
     padding: 1rem;
     vertical-align: middle;
+    background: #ffffff;
   }
 
-  .reviews-table tbody tr {
+  .reviews-table tbody tr:hover td {
+    background-color: #f3f4f6;
     transition: all 0.2s ease;
   }
 
-  .reviews-table tbody tr:hover {
-    background-color: #f3f4f6;
-  }
-
+  /* Score and status badges */
   .score-pill {
     background: #e0e7ff;
     color: #1e40af;
@@ -135,13 +145,37 @@
     color: #991b1b;
   }
 
+  /* Action buttons container */
   .action-buttons {
     display: flex;
     gap: 0.5rem;
+    flex-wrap: wrap;
   }
 
   .action-buttons form {
     margin: 0;
+  }
+
+  /* Column widths */
+  .col-candidate { width: 15%; }
+  .col-reviewer { width: 15%; }
+  .col-repository { width: 15%; }
+  .col-status { width: 10%; }
+  .col-score { width: 10%; }
+  .col-assessment { width: 20%; }
+  .col-actions { width: 15%; }
+
+  /* Responsive adjustments */
+  @media (max-width: 992px) {
+    .action-buttons {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    
+    .action-button {
+      width: 100%;
+      text-align: center;
+    }
   }
 </style>
 
@@ -153,45 +187,45 @@
     </div>
   </div>
 
-  <div class="table-responsive reviews-table">
-    <table class="table table-hover mb-0">
+  <div class="table-container">
+    <table class="table reviews-table">
       <thead>
         <tr>
-          <th>Candidate</th>
-          <th>Reviewer</th>
-          <th>Repository</th>
-          <th>Status</th>
-          <th>Score</th>
-          <th>Assessment</th>
-          <th>Actions</th>
+          <th class="col-candidate">Candidate</th>
+          <th class="col-reviewer">Reviewer</th>
+          <th class="col-repository">Repository</th>
+          <th class="col-status">Status</th>
+          <th class="col-score">Score</th>
+          <th class="col-assessment">Assessment</th>
+          <th class="col-actions">Actions</th>
         </tr>
       </thead>
       <tbody>
         <% @code_reviews.each do |review| %>
           <tr>
-            <td><%= review.candidate_name %></td>
-            <td><%= review.reviewer_name %></td>
-            <td>
+            <td class="col-candidate"><%= review.candidate_name %></td>
+            <td class="col-reviewer"><%= review.reviewer_name %></td>
+            <td class="col-repository">
               <%= link_to "View Repository", review.repository_url, 
                   target: '_blank', 
                   class: 'action-button outline btn-sm' %>
             </td>
-            <td>
+            <td class="col-status">
               <span class="status-badge status-<%= review.status %>">
                 <%= review.status.titleize %>
               </span>
             </td>
-            <td>
+            <td class="col-score">
               <span class="score-pill">
                 <%= review.total_score %> / 115
               </span>
             </td>
-            <td>
+            <td class="col-assessment">
               <span class="assessment-badge <%= "assessment-#{review.assessment_level.downcase.split(' ').first}" %>">
                 <%= review.assessment_level %>
               </span>
             </td>
-            <td>
+            <td class="col-actions">
               <div class="action-buttons">
                 <%= link_to 'View', review, class: 'action-button info btn-sm' %>
                 <%= link_to 'Edit', edit_code_review_path(review), class: 'action-button primary btn-sm' %>

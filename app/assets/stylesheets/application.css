@@ -156,7 +156,6 @@ textarea.auto-expand:focus {
 /* Container Padding */
 .container {
   padding: 1.5rem;
-  max-width: 1000px;
 }
 
 /* Alert Styling */
